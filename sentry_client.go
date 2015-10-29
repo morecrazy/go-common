@@ -34,6 +34,9 @@ func trace() *raven.Stacktrace {
 }
 
 func CheckError(err error) {
+	if nil == SentryClient {
+		return
+	}
 	var in_err error
 	packet := raven.NewPacket(err.Error(), raven.NewException(err, trace()))
 
