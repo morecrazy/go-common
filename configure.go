@@ -50,7 +50,7 @@ type Configure struct {
 	ExternalInt64 map[string]int64
 }
 
-var g_config *Configure
+var Config *Configure
 var g_config_file_last_modify_time time.Time
 var g_local_conf_file string
 
@@ -100,7 +100,7 @@ func InitConfigFile(filename string, config *Configure) error {
 	}
 	fmt.Println("conifg :", *config)
 	g_local_conf_file = filename
-	g_config = config
+	Config = config
 	return nil
 }
 
@@ -116,11 +116,11 @@ func RunDynamicConfigureTimer() {
 }
 
 func dynamicConfigure() {
-	err := InitConfigFile(g_local_conf_file, g_config)
+	err := InitConfigFile(g_local_conf_file, Config)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	ChangeLogLevel(g_config.LogLevel)
+	ChangeLogLevel(Config.LogLevel)
 }
