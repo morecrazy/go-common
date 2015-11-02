@@ -9,8 +9,8 @@ var SentryClient *raven.Client
 
 func InitSentryClient() error {
 	var err error
-	fmt.Println(g_config.SentryUrl)
-	SentryClient, err = raven.NewWithTags(g_config.SentryUrl, map[string]string{"blast": "test"})
+	fmt.Println(Config.SentryUrl)
+	SentryClient, err = raven.NewWithTags(Config.SentryUrl, map[string]string{"blast": "test"})
 	if nil != err {
 		Logger.Error("init sentry client err")
 		return err
