@@ -35,11 +35,19 @@ type CeleryQueue struct {
 	Queue string
 }
 
+type OssConfig struct {
+	AccessKeyId     string
+	AccessKeySecret string
+	Region          string
+	Bucket          string
+}
+
 type Configure struct {
 	MysqlSetting  map[string]MysqlConfig
 	RedisSetting  map[string]RedisConfig
 	RpcSetting    map[string]RPCSetting
 	CelerySetting map[string]CeleryQueue
+	OssSetting    map[string]OssConfig
 	SentryUrl     string
 	LogDir        string
 	LogFile       string
