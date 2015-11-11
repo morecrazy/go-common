@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/mail"
@@ -283,4 +284,66 @@ func SendMail(email, password, host, toemail, sender, receiver, subject, body st
 	)
 	return err
 
+}
+
+type DecimalismConfusion struct {
+	Move    int64
+	StartId int64
+}
+
+func (d *DecimalismConfusion) Init(move, startId int64) error {
+	if move <= 0 {
+		return errors.New("move error")
+	}
+	d.Move = 1
+	var i int64 = 0
+	for ; i < move; i++ {
+		d.Move = d.Move * 10
+	}
+	d.StartId = startId
+	return nil
+}
+
+func (d *DecimalismConfusion) sign(id int64) int64 {
+	var signId int64
+
+	stringId := strconv.FormatInt(id, 10)
+	for i := 0; i < len(stringId); i++ {
+		k := id / 10
+		if k == 0 {
+			signId = signId + id
+			break
+		}
+		ii := id - k*10
+		signId = signId + ii
+		id = k
+	}
+
+	return signId % d.Move
+}
+
+func (d *DecimalismConfusion) EncodeId(id int64) int64 {
+	if id < d.StartId {
+		return id
+	}
+
+	encodeId := id * d.Move
+	encodeId = encodeId + d.sign(id)
+	return encodeId
+}
+
+func (d *DecimalismConfusion) DecodeId(id int64) (int64, error) {
+	if id < d.StartId {
+		return id, nil
+	}
+
+	var decodeId int64
+	decodeId = id / d.Move
+	signId := id - decodeId*d.Move
+	if signId != d.sign(id) {
+		Logger.Error("decode id error: %d", id)
+		return id, errors.New("decode error")
+	}
+
+	return decodeId, nil
 }
