@@ -18,23 +18,23 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	}
 
 	Logger = logging.MustGetLogger(process_name)
-	sql_log_fp, err := os.OpenFile(g_config.LogDir+"/"+process_name+".log.mysql", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	sql_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log.mysql", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		fmt.Println("open file[%s.mysql] failed[%s]", g_config.LogFile, err)
+		fmt.Println("open file[%s.mysql] failed[%s]", Config.LogFile, err)
 		return nil, err
 	}
 
 	MysqlLogger = log.New(sql_log_fp, "", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
 
-	info_log_fp, err := os.OpenFile(g_config.LogDir+"/"+process_name+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	info_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		fmt.Println("open file[%s] failed[%s]", g_config.LogFile, err)
+		fmt.Println("open file[%s] failed[%s]", Config.LogFile, err)
 		return nil, err
 	}
 
-	err_log_fp, err := os.OpenFile(g_config.LogDir+"/"+process_name+".log.wf", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	err_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log.wf", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		fmt.Println("open file[%s.wf] failed[%s]", g_config.LogFile, err)
+		fmt.Println("open file[%s.wf] failed[%s]", Config.LogFile, err)
 		return nil, err
 	}
 
@@ -45,7 +45,7 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	backend_err_formatter := logging.NewBackendFormatter(backend_err, format)
 
 	backend_info_leveld = logging.AddModuleLevel(backend_info_formatter)
-	switch g_config.LogLevel {
+	switch Config.LogLevel {
 	case "ERROR":
 		backend_info_leveld.SetLevel(logging.ERROR, "")
 	case "WARNING":

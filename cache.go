@@ -445,3 +445,17 @@ func (cache *Cache) Lrem(key string, value interface{}) error {
 	}
 	return err
 }
+
+func (cache *Cache) Push(key string, bydata []byte) error {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	_, err := conn.Do("LPUSH", key, bydata)
+	return err
+}
+
+func (cache *Cache) Publish(channel, msg string) error {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	_, err := conn.Do("PUBLISH", channel, msg)
+	return err
+}
