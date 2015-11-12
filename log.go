@@ -40,7 +40,7 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 
 	backend_info := logging.NewLogBackend(info_log_fp, "", 0)
 	backend_err := logging.NewLogBackend(err_log_fp, "", 0)
-	format := logging.MustStringFormatter("%{level}: [%{time:2006-01-02 15:04:05.000}][%{pid}][%{module}][%{shortfile}][%{message}]")
+	format := logging.MustStringFormatter("%{color}%{time:2006-01-02 15:04:05.000} %{level:.4s} %{id:03x} ▶ %{shortfunc}%{color:reset} %{message}")
 	backend_info_formatter := logging.NewBackendFormatter(backend_info, format)
 	backend_err_formatter := logging.NewBackendFormatter(backend_err, format)
 

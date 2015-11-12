@@ -140,23 +140,29 @@ func ParseHttpReqToArgs(r *http.Request, args interface{}) error {
 
 	err := r.ParseForm()
 	if nil != err {
+		Logger.Error("r.ParseForm err : %v", err)
 		err = NewInternalError(DecodeErrCode, err)
 	}
 	err = ParseForm(r.Form, args)
 	if nil != err {
+		Logger.Error("ParseForm err : %v", err)
 		err = NewInternalError(DecodeErrCode, err)
 	}
 
-	var body []byte
-	body, err = ioutil.ReadAll(r.Body)
-	if err != nil {
-		Logger.Error("UpdateUserInfo read body err : %s,%v", r.FormValue("user_id"), err)
-		return err
-	}
-	defer r.Body.Close()
-	if err := json.Unmarshal(body, args); err != nil {
-		Logger.Error("Unmarshal body : %s,%s,%v", r.FormValue("user_id"), string(body), err)
-		return err
+	ct := r.Header.Get("Content-Type")
+	if ct == "application/json" {
+		var body []byte
+		body, err = ioutil.ReadAll(r.Body)
+		if err != nil {
+			Logger.Error("UpdateUserInfo read body err : %s,%v", r.FormValue("user_id"), err)
+			return err
+		}
+		Logger.Debug("body %s", string(body))
+		defer r.Body.Close()
+		if err := json.Unmarshal(body, args); err != nil {
+			Logger.Error("Unmarshal body : %s,%s,%v", r.FormValue("user_id"), string(body), err)
+			return err
+		}
 	}
 
 	return err
