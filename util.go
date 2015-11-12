@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 	"unicode/utf8"
 )
@@ -351,4 +352,8 @@ func (d *DecimalismConfusion) DecodeId(id int64) (int64, error) {
 	}
 
 	return decodeId, nil
+}
+
+func RedirectCoreDump(dump_file *os.File) {
+	syscall.Dup2(int(dump_file.Fd()), 2)
 }
