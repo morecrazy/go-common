@@ -291,17 +291,22 @@ type DecimalismConfusion struct {
 	StartId int64
 }
 
-func (d *DecimalismConfusion) Init(move, startId int64) error {
+func InitDecimalismConfusion(move, startId int64) (*DecimalismConfusion, error) {
 	if move <= 0 {
-		return errors.New("move error")
+		return nil, errors.New("move error")
 	}
-	d.Move = 1
+
+	d := DecimalismConfusion{
+		Move:    1,
+		StartId: startId,
+	}
+
 	var i int64 = 0
 	for ; i < move; i++ {
 		d.Move = d.Move * 10
 	}
-	d.StartId = startId
-	return nil
+
+	return &d, nil
 }
 
 func (d *DecimalismConfusion) sign(id int64) int64 {
@@ -340,8 +345,8 @@ func (d *DecimalismConfusion) DecodeId(id int64) (int64, error) {
 	var decodeId int64
 	decodeId = id / d.Move
 	signId := id - decodeId*d.Move
-	if signId != d.sign(id) {
-		Logger.Error("decode id error: %d", id)
+	if signId != d.sign(decodeId) {
+		fmt.Println(decodeId, signId, d.sign(decodeId))
 		return id, errors.New("decode error")
 	}
 
