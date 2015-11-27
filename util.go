@@ -287,6 +287,49 @@ func SendMail(email, password, host, toemail, sender, receiver, subject, body st
 
 }
 
+func SendGroupMail(email, password, sender, host string, toemail []string, subject, body string) error {
+	b64 := base64.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
+
+	var tos []string
+	from := mail.Address{sender, email}
+
+	for i := range toemail {
+		to := mail.Address{"", toemail[i]}
+		tos = append(tos, to.Address)
+	}
+
+	header := make(map[string]string)
+	header["From"] = from.String()
+	header["To"] = strings.Join(tos, ",")
+	header["Subject"] = fmt.Sprintf("=?UTF-8?B?%s?=", b64.EncodeToString([]byte(subject)))
+	header["MIME-Version"] = "1.0"
+	header["Content-Type"] = "text/html; charset=UTF-8"
+	header["Content-Transfer-Encoding"] = "base64"
+
+	message := ""
+	for k, v := range header {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + b64.EncodeToString([]byte(body))
+
+	auth := smtp.PlainAuth(
+		"",
+		email,
+		password,
+		host,
+	)
+
+	err := smtp.SendMail(
+		host+":25",
+		auth,
+		email,
+		toemail,
+		[]byte(message),
+	)
+	return err
+
+}
+
 type DecimalismConfusion struct {
 	Move    int64
 	StartId int64

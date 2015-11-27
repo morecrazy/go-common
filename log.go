@@ -11,7 +11,7 @@ var Logger *logging.Logger
 var MysqlLogger *log.Logger
 var backend_info_leveld logging.LeveledBackend
 
-func InitLogger(process_name string) (*logging.Logger, error) {
+func InitLogger(process_name, format_str string) (*logging.Logger, error) {
 
 	if Logger != nil {
 		return nil, nil
@@ -40,7 +40,7 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 
 	backend_info := logging.NewLogBackend(info_log_fp, "", 0)
 	backend_err := logging.NewLogBackend(err_log_fp, "", 0)
-	format := logging.MustStringFormatter("%{color}%{time:2006-01-02 15:04:05.000} %{level:.4s} %{id:03x} ▶ %{shortfunc}%{color:reset} %{message}")
+	format := logging.MustStringFormatter(format_str)
 	backend_info_formatter := logging.NewBackendFormatter(backend_info, format)
 	backend_err_formatter := logging.NewBackendFormatter(backend_err, format)
 
