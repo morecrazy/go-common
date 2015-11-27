@@ -63,10 +63,21 @@ type PostData struct {
 }
 
 type Point struct {
-	Distance  float64 `json:"distance"`
-	Vtype     int16   `json:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
-	Timestamp string  `json:"time_stamp"`
+	ToPreviousEnergy   int     `json:topreviousenergy"`
+	ToPreviousCostTime int     `json:"topreviouscostTime"`
+	ToPreviousSpeed    float64 `json:"topreviousspeed"`
+	ToStartDistance    int     `json:"tostartdistance"`
+	ToStartCostTime    float64 `json:"tostartcostTime"`
+	Distance           float64 `json:"distance"`
+	Longitude          float64 `json:"longitude"`
+	Latitude           float64 `json:"latitude"`
+	Elevation          float64 `json:"elevation"`
+	HAccuracy          float64 `json:"hAccuracy"`
+	VAccuracy          int     `json:"vAccuracy"`
+	Type               int     `json:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
+	TimeStamp          string  `json:"time_stamp"`
 }
+
 type UseTimePerKm struct {
 	TotalUseTime float64 `json:"totalUseTime"`
 	UseTime      float64 `json:"useTime"`
