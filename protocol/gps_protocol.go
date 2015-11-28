@@ -66,7 +66,7 @@ type Point struct {
 	ToPreviousEnergy   float64 `json:topreviousenergy"`
 	ToPreviousCostTime int     `json:"topreviouscostTime"`
 	ToPreviousSpeed    float64 `json:"topreviousspeed"`
-	ToStartDistance    int     `json:"tostartdistance"`
+	ToStartDistance    float64 `json:"tostartdistance"`
 	ToStartCostTime    float64 `json:"tostartcostTime"`
 	Distance           float64 `json:"distance"`
 	Longitude          float64 `json:"longitude"`
