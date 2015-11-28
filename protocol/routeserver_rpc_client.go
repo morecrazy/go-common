@@ -11,5 +11,5 @@ type SimplifyProcRouteLogRes struct {
 }
 
 var RouteServerRpcFuncMap map[string]string = map[string]string{
-	"simplify_proc_route_log": "RouteServerClinet.SimplifyProcRouteLog",
+	"simplify_proc_route_log": "RouteHandler.SimplifyProcRouteLog",
 }
