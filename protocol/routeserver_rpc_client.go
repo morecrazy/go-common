@@ -10,6 +10,6 @@ type SimplifyProcRouteLogRes struct {
 	IsFraud bool   `json:"is_fraud"`
 }
 
-var UserRelationRpcFuncMap map[string]string = map[string]string{
+var RouteServerRpcFuncMap map[string]string = map[string]string{
 	"simplify_proc_route_log": "RouteServerClinet.SimplifyProcRouteLog",
 }
