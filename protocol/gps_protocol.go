@@ -63,7 +63,7 @@ type PostData struct {
 }
 
 type Point struct {
-	ToPreviousEnergy   int     `json:topreviousenergy"`
+	ToPreviousEnergy   float64 `json:topreviousenergy"`
 	ToPreviousCostTime int     `json:"topreviouscostTime"`
 	ToPreviousSpeed    float64 `json:"topreviousspeed"`
 	ToStartDistance    int     `json:"tostartdistance"`

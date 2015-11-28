@@ -44,7 +44,7 @@ func InitGormDbPool(config *MysqlConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("init db pool OK")
+	//	fmt.Println("init db pool OK")
 
 	return &db, nil
 }
