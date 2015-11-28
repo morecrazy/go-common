@@ -4,6 +4,7 @@ import . "backend/common/protocol"
 
 var UserProfileClient *RpcClient
 var UserRelationClient *RpcClient
+var RouteServerClinet *RpcClient
 
 func InitClient() error {
 	var err error
@@ -17,5 +18,28 @@ func InitClient() error {
 		Logger.Error("init UserRelationClient err :", err.Error())
 	}
 
+	RouteServerClinet, err = NewRpcClient(Config.RpcSetting["RouteServerSetting"].Addr, Config.RpcSetting["RouteServerSetting"].Net, RouteServerRpcFuncMap, "routeserver", Logger)
+	if err != nil {
+		Logger.Error("init RouteServerClinet err :", err.Error())
+	}
+
 	return nil
+}
+
+func SimplifyProcRouteLog(userId string, postData map[string]interface{}) SimplifyProcRouteLogRes {
+	var reply SimplifyProcRouteLogRes
+	args := SimplifyProcRouteLogReq{
+		RouteLog: RouteLog{
+			UserId:   userId,
+			PostData: postData,
+		},
+	}
+	Logger.Debug("SimplifyProcRouteLog arg %v", args)
+	err := RouteServerClinet.Call("simplify_proc_route_log", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply
 }
