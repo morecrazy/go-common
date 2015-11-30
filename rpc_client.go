@@ -26,7 +26,7 @@ func InitClient() error {
 	return nil
 }
 
-func SimplifyProcRouteLog(userId string, postData map[string]interface{}) SimplifyProcRouteLogRes {
+func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
 	var reply SimplifyProcRouteLogRes
 	args := SimplifyProcRouteLogReq{
 		RouteLog: RouteLog{
@@ -41,10 +41,10 @@ func SimplifyProcRouteLog(userId string, postData map[string]interface{}) Simpli
 		err = NewInternalError(RPCErrCode, err)
 	}
 
-	return reply
+	return reply, err
 }
 
-func SaveRouteLog(routeId, userId string, postData map[string]interface{}) SaveRouteLogRes {
+func SaveRouteLog(routeId, userId string, postData map[string]interface{}) (SaveRouteLogRes, error) {
 	var reply SaveRouteLogRes
 	args := SaveRouteLogReq{
 		RouteLog: RouteLog{
@@ -60,5 +60,5 @@ func SaveRouteLog(routeId, userId string, postData map[string]interface{}) SaveR
 		err = NewInternalError(RPCErrCode, err)
 	}
 
-	return reply
+	return reply, err
 }
