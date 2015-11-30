@@ -34,8 +34,27 @@ func SimplifyProcRouteLog(userId string, postData map[string]interface{}) Simpli
 			PostData: postData,
 		},
 	}
-	Logger.Debug("SimplifyProcRouteLog arg %v", args)
+	//	Logger.Debug("SimplifyProcRouteLog arg %v", args)
 	err := RouteServerClinet.Call("simplify_proc_route_log", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply
+}
+
+func SaveRouteLog(routeId, userId string, postData map[string]interface{}) SaveRouteLogRes {
+	var reply SaveRouteLogRes
+	args := SaveRouteLogReq{
+		RouteLog: RouteLog{
+			RouteId:  routeId,
+			UserId:   userId,
+			PostData: postData,
+		},
+	}
+	//	Logger.Debug("SimplifyProcRouteLog arg %v", args)
+	err := RouteServerClinet.Call("save_routelog", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
 		err = NewInternalError(RPCErrCode, err)
