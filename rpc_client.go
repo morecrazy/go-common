@@ -47,9 +47,7 @@ func GetProfileById(userId string) (UserProfile, error) {
 	return reply.User, err
 }
 
-func GetFollower(userId string) []string {
-	var follower_ids []string
-
+func GetFollower(userId string) (follower_ids []string, err error) {
 	var get_all = false
 	var page_num = 1
 	for !get_all {
@@ -60,10 +58,10 @@ func GetFollower(userId string) []string {
 		}
 		var resp GetFollowingRes
 
-		err := UserRelationClient.Call("get_follower", &req, &resp)
+		err = UserRelationClient.Call("get_follower", &req, &resp)
 		if nil != err {
 			Logger.Error("get_follower err :%v", err)
-			return follower_ids
+			return follower_ids, err
 		}
 		page_num += 1
 		//fmt.Println("followers", resp.Data)
@@ -82,7 +80,7 @@ func GetFollower(userId string) []string {
 		}
 	}
 
-	return follower_ids
+	return follower_ids, err
 }
 
 func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
