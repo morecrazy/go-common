@@ -32,6 +32,59 @@ func InitClient() error {
 	return nil
 }
 
+func GetProfileById(userId string) (UserProfile, error) {
+	var reply UserprofileDefaultReply
+	args := UserprofileDefaultArgs{
+		Id: userId,
+	}
+	Logger.Debug("GetProfileById %v", args)
+	err := UserProfileClient.Call("get", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply.User, err
+}
+
+func GetFollower(userId string) []string {
+	var follower_ids []string
+
+	var get_all = false
+	var page_num = 1
+	for !get_all {
+		var req = GetFollowingReq{
+			Selfuserid: userId,
+			Pagenum:    page_num,
+			Pagesize:   1000,
+		}
+		var resp GetFollowingRes
+
+		err := UserRelationClient.Call("get_follower", &req, &resp)
+		if nil != err {
+			Logger.Error("get_follower err :%v", err)
+			return follower_ids
+		}
+		page_num += 1
+		//fmt.Println("followers", resp.Data)
+
+		if 0 == len(resp.Data) {
+			break
+		}
+
+		for _, value := range resp.Data {
+			follower_ids = append(follower_ids, value)
+		}
+		if len(resp.Data) >= 1000 {
+			get_all = false
+		} else {
+			get_all = true
+		}
+	}
+
+	return follower_ids
+}
+
 func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
 	var reply SimplifyProcRouteLogRes
 	args := SimplifyProcRouteLogReq{
