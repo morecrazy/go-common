@@ -14,7 +14,7 @@ func InitClient() error {
 		Logger.Error("init UserProfileClient err :", err.Error())
 	}
 
-	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
+	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserRelationSetting"].Addr, Config.RpcSetting["UserRelationSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
 	if err != nil {
 		Logger.Error("init UserRelationClient err :", err.Error())
 	}
@@ -64,7 +64,6 @@ func GetFollower(userId string) (follower_ids []string, err error) {
 			return follower_ids, err
 		}
 		page_num += 1
-		//fmt.Println("followers", resp.Data)
 
 		if 0 == len(resp.Data) {
 			break
