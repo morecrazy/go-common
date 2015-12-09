@@ -37,7 +37,7 @@ func GetProfileById(userId string) (UserProfile, error) {
 	args := UserprofileDefaultArgs{
 		Id: userId,
 	}
-	Logger.Debug("GetProfileById %v", args)
+	//	Logger.Debug("GetProfileById %v", args)
 	err := UserProfileClient.Call("get", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
@@ -130,7 +130,7 @@ func UpdateSportInfo(userId, curDay string, daySummary, weekSummary, monthSummar
 		YearSummary:  yearSummary,
 		AllSummary:   allSummary,
 	}
-	Logger.Debug("UpdateSportInfo arg %v", args)
+	//	Logger.Debug("UpdateSportInfo arg %v", args)
 	err := SportSortClinet.Call("update_sport_info", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())

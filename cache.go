@@ -113,6 +113,17 @@ func (cache *Cache) Incr(key string) (int, error) {
 	return res, err
 }
 
+func (cache *Cache) Incrby(key string, value int) (int, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := redis.Int(conn.Do("INCRBY", key, value))
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) MGet(key []interface{}) (interface{}, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
