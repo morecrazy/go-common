@@ -193,11 +193,11 @@ func SendResponse(c *gin.Context, http_code int, data interface{}, err error) er
 		Logger.Error("Marshal json to bytes error :%v", err)
 	}
 
-	if len(b) > 10000 {
-		Logger.Info(string(b[:10000]))
-	} else {
-		Logger.Info(string(b))
-	}
+	//	if len(b) > 10000 {
+	//		Logger.Info(string(b[:10000]))
+	//	} else {
+	//		Logger.Info(string(b))
+	//	}
 
 	c.Writer.Write(b)
 
