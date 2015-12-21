@@ -3,6 +3,7 @@ package common
 import . "backend/common/protocol"
 
 var UserProfileClient *RpcClient
+var UserLoginClient *RpcClient
 var UserRelationClient *RpcClient
 var RouteServerClinet *RpcClient
 var SportSortClinet *RpcClient
@@ -12,6 +13,11 @@ func InitClient() error {
 	UserProfileClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserprofileRpcFuncMap, "userprofile", Logger)
 	if err != nil {
 		Logger.Error("init UserProfileClient err :", err.Error())
+	}
+
+	UserLoginClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserloginRpcFuncMap, "userlogin", Logger)
+	if err != nil {
+		Logger.Error("init UserLoginClient err :", err.Error())
 	}
 
 	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserRelationSetting"].Addr, Config.RpcSetting["UserRelationSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
@@ -45,6 +51,21 @@ func GetProfileById(userId string) (UserProfile, error) {
 	}
 
 	return reply.User, err
+}
+
+func GetLoginById(userId string) (UserLogin, error) {
+	var reply UserloginDefaultReply
+	args := UserloginDefaultArgs{
+		Id: userId,
+	}
+	//	Logger.Debug("GetProfileById %v", args)
+	err := UserLoginClient.Call("get", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply.UserLogin, err
 }
 
 func GetFollower(userId string) (follower_ids []string, err error) {
