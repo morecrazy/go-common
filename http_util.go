@@ -215,8 +215,6 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 	var request *http.Request
 	var body []byte
 
-	Logger.Info("http:%s,%v", urls, req_body)
-
 	if nil != req_body {
 		request, _ = http.NewRequest(http_method, urls, nil)
 		request.Header.Set("Content-Type", "application/json")
@@ -234,6 +232,8 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 
+	Logger.Debug("request %v", request)
+
 	response, err := client.Do(request)
 	if nil != err {
 		err = NewInternalError(HttpErrCode, err)
@@ -245,7 +245,7 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 		defer response.Body.Close()
 		body, err = ioutil.ReadAll(response.Body)
 		if nil == err {
-			Logger.Info("body:%v", string(body))
+			Logger.Debug("body:%v", string(body))
 		}
 	} else {
 		err = NewInternalError(HttpErrCode, fmt.Errorf("http code :%d", response.StatusCode))
