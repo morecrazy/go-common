@@ -237,6 +237,17 @@ func (cache *Cache) HGetAll(key string) ([]byte, error) {
 	return res, err
 }
 
+func (cache *Cache) GetInt(key string) (int, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := redis.Int(conn.Do("GET", key))
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) GetInts(key string) ([]int, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
