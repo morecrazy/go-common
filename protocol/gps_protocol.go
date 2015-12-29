@@ -48,18 +48,42 @@ type RouteLog struct {
 }
 
 type PostData struct {
-	StartTime     string      `json:"start_time"`
-	EndTime       string      `json:"end_time"`
-	ProductId     string      `json:"product_id"`
-	SportsType    float64     `json:"sports_type"`
-	TotalLength   float64     `json:"total_length"`
-	TotalCalories float64     `json:"total_calories"`
-	TotalTime     float64     `json:"total_time"`
-	AverageSpeed  float64     `json:"AverageSpeed"`
-	Points        interface{} `json:"points"`
-	UserTimePerkm interface{} `json:"usettime_per_km"`
-	UserSteps     interface{} `json:"user_steps_list"`
-	UserStepsPerm interface{} `json:"user_steps_list_perm"`
+	SportsType         int                    `json:"sports_type" form:"sports_type"`
+	OffsetText         string                 `json:"offset_text" form:"offset_text"`
+	SportsMode         int                    `json:"sportsMode" form:"sportsMode"`
+	Version            string                 `json:"version" form:"version"`
+	HistoryVersion     int                    `json:"history_version" form:"history_version"`
+	StartTime          string                 `json:"start_time" form:"start_time"`
+	EndTime            string                 `json:"end_time" form:"end_time"`
+	ProductId          string                 `json:"product_id" form:"product_id"`
+	IsOpen             int16                  `json:"is_open" form:"is_open"`
+	GoalValue          int                    `json:"goal_value" form:"goal_value"`
+	GoalType           int                    `json:"goal_type" form:"goal_type"`
+	StageDes           string                 `json:"stage_des" form:"stage_des"`
+	MaxAltitude        float64                `json:"MaxAltitude" form:"MaxAltitude"`
+	MaxToPreviousSpeed float64                `json:"MaxToPreviousSpeed" form:"MaxToPreviousSpeed"`
+	TotalTime          int                    `json:"total_time" form:"total_time"`
+	TotalCalories      float64                `json:"total_calories" form:"total_calories"`
+	Location           string                 `json:"location" form:"location"`
+	TotalLength        float64                `json:"total_length" form:"total_length`
+	ActivityResult     int                    `json:"activity_result" form:"activity_result"`
+	ActivityType       int                    `json:"activity_type" form:"activity_type"`
+	BaiduCloud         bool                   `json:"baidu_cloud" form:"baidu_cloud"`
+	HighestSpeedPerkm  int                    `json:"highest_speed_perkm" form:"highest_speed_perkm"`
+	CustomWords        string                 `json:"custom_words" form:"custom_words"`
+	CaloriesPerm       []int                  `json:"calories_per_m" form:"calories_per_m"`
+	IsReal             bool                   `json:"is_real" form:"is_real"`
+	ProgramName        string                 `json:"program_name" form:"program_name"`
+	Model              string                 `json:"model" form:"model"`
+	LastOfProgram      int                    `json:"last_of_program" form:"last_of_program"`
+	UserTimePerkm      []UseTimePerKm         `json:"usettime_per_km" form:"usettime_per_km"`
+	UserStepsPerm      []interface{}          `json:"user_steps_list_perm"`
+	AverageSpeed       float64                `json:"AverageSpeed" form:"AverageSpeed"`
+	Points             []Point                `json:"points" form:"points"`
+	HeartRate          map[string]interface{} `json:"heart_rate" form:"heart_rate"`
+	GreenwayId         string                 `json:"greenway_id" form:"greenway_id"`
+	HalfMarathon       int                    `json:"half_marathon" form:"half_marathon"`
+	Marathon           int                    `json:"marathon" form:"marathon"`
 }
 
 type Point struct {
