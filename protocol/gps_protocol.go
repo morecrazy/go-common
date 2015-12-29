@@ -59,7 +59,7 @@ type PostData struct {
 	ProductId          string                 `json:"product_id" form:"product_id"`
 	IsOpen             int16                  `json:"is_open" form:"is_open"`
 	IsReal             bool                   `json:"is_real" form:"is_real"`
-	IsBaidu            int                    `json:"is_baidu" form:"is_baidu"`
+	IsBaidu            int16                  `json:"is_baidu" form:"is_baidu"`
 	GoalValue          int                    `json:"goal_value" form:"goal_value"`
 	GoalType           int                    `json:"goal_type" form:"goal_type"`
 	StageDes           string                 `json:"stage_des" form:"stage_des"`
@@ -78,7 +78,8 @@ type PostData struct {
 	Model              string                 `json:"model" form:"model"`
 	LastOfProgram      int                    `json:"last_of_program" form:"last_of_program"`
 	UserTimePerkm      []UseTimePerKm         `json:"usettime_per_km" form:"usettime_per_km"`
-	UserStepsPerm      []interface{}          `json:"user_steps_list_perm"`
+	UserStepsPerm      []interface{}          `json:"user_steps_list_perm" form:"user_steps_list_perm"`
+	UserStepsValid     int16                  `json:"user_steps_valid" form:"user_steps_valid"`
 	AverageSpeed       float64                `json:"AverageSpeed" form:"AverageSpeed"`
 	Points             []Point                `json:"points" form:"points"`
 	HeartRate          map[string]interface{} `json:"heart_rate" form:"heart_rate"`
