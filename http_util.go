@@ -137,7 +137,7 @@ func ParseForm(form url.Values, obj interface{}) error {
 }
 
 func ParseHttpReqToArgs(r *http.Request, args interface{}) error {
-
+	var err error
 	ct := r.Header.Get("Content-Type")
 	if ct == "application/json" {
 		var body []byte
@@ -153,7 +153,7 @@ func ParseHttpReqToArgs(r *http.Request, args interface{}) error {
 			return err
 		}
 	} else {
-		err := r.ParseForm()
+		err = r.ParseForm()
 		if nil != err {
 			Logger.Error("r.ParseForm err : %v", err)
 			err = NewInternalError(DecodeErrCode, err)
