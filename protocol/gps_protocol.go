@@ -53,26 +53,27 @@ type PostData struct {
 	SportsMode         int                    `json:"sportsMode" form:"sportsMode"`
 	Version            string                 `json:"version" form:"version"`
 	HistoryVersion     int                    `json:"history_version" form:"history_version"`
+	Location           string                 `json:"location" form:"location"`
 	StartTime          string                 `json:"start_time" form:"start_time"`
 	EndTime            string                 `json:"end_time" form:"end_time"`
 	ProductId          string                 `json:"product_id" form:"product_id"`
 	IsOpen             int16                  `json:"is_open" form:"is_open"`
+	IsReal             bool                   `json:"is_real" form:"is_real"`
+	IsBaidu            bool                   `json:"is_baidu" form:"is_baidu"`
 	GoalValue          int                    `json:"goal_value" form:"goal_value"`
 	GoalType           int                    `json:"goal_type" form:"goal_type"`
 	StageDes           string                 `json:"stage_des" form:"stage_des"`
 	MaxAltitude        float64                `json:"MaxAltitude" form:"MaxAltitude"`
 	MaxToPreviousSpeed float64                `json:"MaxToPreviousSpeed" form:"MaxToPreviousSpeed"`
 	TotalTime          int                    `json:"total_time" form:"total_time"`
-	TotalCalories      float64                `json:"total_calories" form:"total_calories"`
-	Location           string                 `json:"location" form:"location"`
 	TotalLength        float64                `json:"total_length" form:"total_length`
+	TotalCalories      float64                `json:"total_calories" form:"total_calories"`
 	ActivityResult     int                    `json:"activity_result" form:"activity_result"`
 	ActivityType       int                    `json:"activity_type" form:"activity_type"`
 	BaiduCloud         bool                   `json:"baidu_cloud" form:"baidu_cloud"`
 	HighestSpeedPerkm  int                    `json:"highest_speed_perkm" form:"highest_speed_perkm"`
 	CustomWords        string                 `json:"custom_words" form:"custom_words"`
 	CaloriesPerm       []int                  `json:"calories_per_m" form:"calories_per_m"`
-	IsReal             bool                   `json:"is_real" form:"is_real"`
 	ProgramName        string                 `json:"program_name" form:"program_name"`
 	Model              string                 `json:"model" form:"model"`
 	LastOfProgram      int                    `json:"last_of_program" form:"last_of_program"`
