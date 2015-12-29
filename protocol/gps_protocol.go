@@ -59,7 +59,7 @@ type PostData struct {
 	ProductId          string                 `json:"product_id" form:"product_id"`
 	IsOpen             int16                  `json:"is_open" form:"is_open"`
 	IsReal             bool                   `json:"is_real" form:"is_real"`
-	IsBaidu            bool                   `json:"is_baidu" form:"is_baidu"`
+	IsBaidu            int                    `json:"is_baidu" form:"is_baidu"`
 	GoalValue          int                    `json:"goal_value" form:"goal_value"`
 	GoalType           int                    `json:"goal_type" form:"goal_type"`
 	StageDes           string                 `json:"stage_des" form:"stage_des"`
