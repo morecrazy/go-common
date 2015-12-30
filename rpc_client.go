@@ -6,7 +6,7 @@ var UserProfileClient *RpcClient
 var UserLoginClient *RpcClient
 var UserRelationClient *RpcClient
 var RouteServerClinet *RpcClient
-var SportSortClinet *RpcClient
+var SportsSortClinet *RpcClient
 
 func InitClient() error {
 	var err error
@@ -30,9 +30,9 @@ func InitClient() error {
 		Logger.Error("init RouteServerClinet err :", err.Error())
 	}
 
-	SportSortClinet, err = NewRpcClient(Config.RpcSetting["SportSortSetting"].Addr, Config.RpcSetting["SportSortSetting"].Net, SportSortRpcFuncMap, "sportsort", Logger)
+	SportsSortClinet, err = NewRpcClient(Config.RpcSetting["SportsSortSetting"].Addr, Config.RpcSetting["SportsSortSetting"].Net, SportsSortRpcFuncMap, "sportssort", Logger)
 	if err != nil {
-		Logger.Error("init SportSortClinet err :", err.Error())
+		Logger.Error("init SportsSortClinet err :", err.Error())
 	}
 
 	return nil
@@ -51,6 +51,19 @@ func GetProfileById(userId string) (UserProfile, error) {
 	}
 
 	return reply.User, err
+}
+
+func BatchGetProfileByIds(userIds []string) (UserprofileList, error) {
+	var reply UserprofileBatchReply
+	args := UserprofileBatchArgs{
+		Ids: userIds,
+	}
+	err := UserProfileClient.Call("batch_get", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+	return reply.Users, err
 }
 
 func GetLoginById(userId string) (UserLogin, error) {
@@ -187,7 +200,27 @@ func UpdateSportInfo(userId, curDay string, daySummary, weekSummary, monthSummar
 		AllSummary:   allSummary,
 	}
 	//	Logger.Debug("UpdateSportInfo arg %v", args)
-	err := SportSortClinet.Call("update_sport_info", &args, &reply)
+	err := SportsSortClinet.Call("update_sport_info", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply, err
+}
+
+func GetUserSort(userIds []string, sportType, sortType, relationType, pageNum, pageSize int) (GetUserSortResp, error) {
+	var reply GetUserSortResp
+	args := GetUserSortReq{
+		UserIds:      userIds,
+		SportType:    sportType,
+		SortType:     sortType,
+		RelationType: relationType,
+		PageNum:      pageNum,
+		PageSize:     pageSize,
+	}
+	//	Logger.Debug("GetUserSort arg %v", args)
+	err := SportsSortClinet.Call("get_user_sport", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
 		err = NewInternalError(RPCErrCode, err)

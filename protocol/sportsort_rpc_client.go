@@ -14,7 +14,27 @@ type UpdateUserSportInfoResp struct {
 	Data int `json:"data"`
 }
 
-var SportSortRpcFuncMap map[string]string = map[string]string{
+type GetUserSortReq struct {
+	UserIds      []string `json:"user_ids"`
+	SportType    int      `json:"sport_type"`    //0 all, 1 run, 2 ride, 3 walk, 4 ski, 5 skate, 6 climb
+	SortType     int      `json:"sort_type"`     //0 week, 1 month, 2 all, 3 last week  4, day
+	RelationType int      `json:"relation_type"` //0 group, 1 friend,
+	PageNum      int      `json:"page_num"`
+	PageSize     int      `json:"page_size"`
+}
+
+type UserSportInfo struct {
+	UserId   string  `json:"user_id"`
+	Distance float64 `json:"distance"`
+}
+
+type SportSlice []*UserSportInfo
+
+type GetUserSortResp struct {
+	Data SportSlice `json:"data"`
+}
+
+var SportsSortRpcFuncMap map[string]string = map[string]string{
 	"update_sport_info": "SportsSortHandler.UpdateUserSportInfo",
-	//"save_routelog":           "RouteHandler.SaveRouteLog",
+	"get_user_sort":     "SportsSortHandler.GetUserSort",
 }
