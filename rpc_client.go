@@ -169,7 +169,7 @@ func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (Simpl
 	return reply, err
 }
 
-func SaveRouteLog(routeId, userId string, postData map[string]interface{}) (SaveRouteLogRes, error) {
+func ProcRouteLog(routeId, userId string, postData map[string]interface{}) (SaveRouteLogRes, error) {
 	var reply SaveRouteLogRes
 	args := SaveRouteLogReq{
 		RouteLog: RouteLog{
@@ -178,7 +178,7 @@ func SaveRouteLog(routeId, userId string, postData map[string]interface{}) (Save
 			PostData: postData,
 		},
 	}
-	//	Logger.Debug("SimplifyProcRouteLog arg %v", args)
+	//	Logger.Debug("ProcRouteLog arg %v", args)
 	err := RouteServerClinet.Call("save_routelog", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
