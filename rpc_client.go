@@ -8,7 +8,7 @@ var UserRelationClient *RpcClient
 var RouteServerClinet *RpcClient
 var SportsSortClinet *RpcClient
 
-func InitClient() error {
+func InitRpcClient() error {
 	var err error
 	UserProfileClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserprofileRpcFuncMap, "userprofile", Logger)
 	if err != nil {
