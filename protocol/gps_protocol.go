@@ -71,7 +71,7 @@ type PostData struct {
 	ActivityResult     int                    `json:"activity_result" form:"activity_result"`
 	ActivityType       int                    `json:"activity_type" form:"activity_type"`
 	BaiduCloud         bool                   `json:"baidu_cloud" form:"baidu_cloud"`
-	HighestSpeedPerkm  int                    `json:"highest_speed_perkm" form:"highest_speed_perkm"`
+	HighestSpeedPerkm  float64                `json:"highest_speed_perkm" form:"highest_speed_perkm"`
 	CustomWords        string                 `json:"custom_words" form:"custom_words"`
 	CaloriesPerm       []int                  `json:"calories_per_m" form:"calories_per_m"`
 	ProgramName        string                 `json:"program_name" form:"program_name"`
