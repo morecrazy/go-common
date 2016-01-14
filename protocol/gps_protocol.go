@@ -78,7 +78,7 @@ type PostData struct {
 	Model              string                 `json:"model" form:"model"`
 	LastOfProgram      int                    `json:"last_of_program" form:"last_of_program"`
 	UserTimePerkm      []UseTimePerKm         `json:"usettime_per_km" form:"usettime_per_km"`
-	UserStepsPerm      []interface{}          `json:"user_steps_list_perm" form:"user_steps_list_perm"`
+	UserStepsPerm      []UserStepPerM         `json:"user_steps_list_perm" form:"user_steps_list_perm"`
 	UserStepsValid     int16                  `json:"user_steps_valid" form:"user_steps_valid"`
 	AverageSpeed       float64                `json:"AverageSpeed" form:"AverageSpeed"`
 	Points             []Point                `json:"points" form:"points"`
@@ -111,7 +111,7 @@ type UseTimePerKm struct {
 	Distance     float64 `json:"distance"`
 }
 
-type UserStep struct {
+type UserStepPerM struct {
 	Timestamp string `json:"time_stamp"`
 	Steps     int64  `json:"steps"`
 }
