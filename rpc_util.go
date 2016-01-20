@@ -11,6 +11,7 @@ type Log interface {
 	Error(format string, args ...interface{})
 	Info(format string, args ...interface{})
 	Notice(format string, args ...interface{})
+	Debug(format string, args ...interface{})
 }
 
 type RpcClient struct {
@@ -51,7 +52,7 @@ func (client *RpcClient) Connect() (*rpc.Client, error) {
 
 func (client *RpcClient) Call(method string, args interface{}, reply interface{}) error {
 	if "add_picture" != method {
-		client.logger.Info("call rpc : %s, %v", method, args)
+		client.logger.Debug("call rpc : %s, %v", method, args)
 	}
 	rpc_client, err := client.pool.Get()
 	if err != nil {
