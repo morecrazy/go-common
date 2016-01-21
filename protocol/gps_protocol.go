@@ -99,7 +99,7 @@ type Point struct {
 	Latitude           float64 `json:"latitude"`
 	Elevation          float64 `json:"elevation"`
 	HAccuracy          float64 `json:"hAccuracy"`
-	VAccuracy          int     `json:"vAccuracy"`
+	VAccuracy          float64 `json:"vAccuracy"`
 	Type               int     `json:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
 	TimeStamp          string  `json:"time_stamp"`
 }
