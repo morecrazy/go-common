@@ -31,6 +31,36 @@ func NotFoundHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 var sliceOfInts = reflect.TypeOf([]int(nil))
 var sliceOfStrings = reflect.TypeOf([]string(nil))
 
+func FormatUserAgent(user_agent string) map[string]interface{} {
+	dealed_user_agent := strings.TrimSpace(strings.ToLower(user_agent))
+	result := map[string]interface{}{
+		"version":      "0.0.0",
+		"iner_version": 0,
+		"platform":     0,
+	}
+
+	if !strings.Contains(dealed_user_agent, "codoonsport(") {
+		return result
+	}
+
+	var platform = 1
+	if strings.Contains(dealed_user_agent, "ios") {
+		platform = 0
+	}
+
+	dealed_user_agent = strings.Replace(dealed_user_agent, "codoonsport(", "", -1)
+	array_user_agent := strings.Split(dealed_user_agent, ")")
+	if array_user_agent == nil {
+		return result
+	}
+	ver_list := strings.Split(strings.Split(array_user_agent[0], ";")[0], " ")
+	result["version"] = ver_list[0]
+	result["iner_version"] = ver_list[1]
+	result["platform"] = platform
+	return result
+
+}
+
 // parse form values to struct via tag.
 func ParseForm(form url.Values, obj interface{}) error {
 	objT := reflect.TypeOf(obj)
