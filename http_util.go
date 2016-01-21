@@ -239,22 +239,22 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 	if nil != err {
 		err = NewInternalError(HttpErrCode, err)
 		Logger.Error("send request err :%v", err)
-		return 200, "", err
+		return response.StatusCode, "", err
 	}
 
-	if response.StatusCode == 200 {
+	if response.StatusCode == http.StatusOK {
 		defer response.Body.Close()
 		body, err = ioutil.ReadAll(response.Body)
 		if nil == err {
 			Logger.Debug("body:%v", string(body))
 		}
+		return response.StatusCode, string(body), err
 	} else {
 		err = NewInternalError(HttpErrCode, fmt.Errorf("http code :%d", response.StatusCode))
 		Logger.Error("send request err :%v", err)
-		return 200, "", err
+		return response.StatusCode, "", err
 	}
 
-	return response.StatusCode, string(body), err
 }
 
 func SendFormRequest(http_method, urls string, req_form map[string]string) (int, string, error) {
