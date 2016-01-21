@@ -80,6 +80,8 @@ func InitConfigFile(filename string, config *Configure) error {
 		filename = filename + ".pre"
 	case "ONLINE":
 		filename = filename + ".online"
+	default:
+		filename = filename + ".test"
 	}
 
 	fmt.Println("filename", filename)
