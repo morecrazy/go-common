@@ -269,7 +269,7 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 	if nil != err {
 		err = NewInternalError(HttpErrCode, err)
 		Logger.Error("send request err :%v", err)
-		return response.StatusCode, "", err
+		return http.StatusNotFound, "", err
 	}
 
 	if response.StatusCode == http.StatusOK {
