@@ -89,27 +89,27 @@ type PostData struct {
 }
 
 type Point struct {
-	ToPreviousEnergy   float64 `json:"topreviousenergy" form:"topreviousenergy"`
-	ToPreviousCostTime int     `json:"topreviouscostTime" form:"topreviouscostTime"`
-	ToPreviousSpeed    float64 `json:"topreviousspeed" form:"topreviousspeed"`
-	ToStartDistance    float64 `json:"tostartdistance" form:"tostartdistance"`
-	ToStartCostTime    float64 `json:"tostartcostTime" form:"tostartcostTime"`
-	Distance           float64 `json:"distance" form:"distance"`
-	Longitude          float64 `json:"longitude" form:"longitude"`
-	Latitude           float64 `json:"latitude" form:"latitude"`
-	Elevation          float64 `json:"elevation" form:"elevation"`
-	HAccuracy          float64 `json:"hAccuracy" form:"hAccuracy"`
-	VAccuracy          float64 `json:"vAccuracy" form:"vAccuracy"`
-	Type               int     `json:"type" form:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
-	TimeStamp          string  `json:"time_stamp" form:"time_stamp"`
+	ToPreviousEnergy   float64 `json:"topreviousenergy" pickle:"topreviousenergy"`
+	ToPreviousCostTime int     `json:"topreviouscostTime" pickle:"topreviouscostTime"`
+	ToPreviousSpeed    float64 `json:"topreviousspeed" pickle:"topreviousspeed"`
+	ToStartDistance    float64 `json:"tostartdistance" pickle:"tostartdistance"`
+	ToStartCostTime    float64 `json:"tostartcostTime" pickle:"tostartcostTime"`
+	Distance           float64 `json:"distance" pickle:"distance"`
+	Longitude          float64 `json:"longitude" pickle:"longitude"`
+	Latitude           float64 `json:"latitude" pickle:"latitude"`
+	Elevation          float64 `json:"elevation" pickle:"elevation"`
+	HAccuracy          float64 `json:"hAccuracy" pickle:"hAccuracy"`
+	VAccuracy          float64 `json:"vAccuracy" pickle:"vAccuracy"`
+	Type               int     `json:"type" pickle:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
+	TimeStamp          string  `json:"time_stamp" pickle:"time_stamp"`
 }
 
 type UseTimePerKm struct {
-	TotalUseTime float64    `json:"totalUseTime" form:"totalUseTime"`
-	UseTime      float64    `json:"useTime" form:"useTime"`
-	AtLocation   AtLocation `json:"atLocation" form:"atLocation"`
-	Speed        float64    `json:"speed" form:"speed"`
-	Distance     float64    `json:"distance" form:"distance"`
+	TotalUseTime float64    `json:"totalUseTime" pickle:"totalUseTime"`
+	UseTime      float64    `json:"useTime" pickle:"useTime"`
+	AtLocation   AtLocation `json:"atLocation" pickle:"atLocation"`
+	Speed        float64    `json:"speed" pickle:"speed"`
+	Distance     float64    `json:"distance" pickle:"distance"`
 }
 
 type AtLocation struct {
