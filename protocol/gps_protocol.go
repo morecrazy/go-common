@@ -58,7 +58,7 @@ type PostData struct {
 	EndTime            string                 `json:"end_time" form:"end_time"`
 	ProductId          string                 `json:"product_id" form:"product_id"`
 	IsOpen             int16                  `json:"is_open" form:"is_open"`
-	IsReal             bool                   `json:"is_real" form:"is_real"`
+	IsReal             interface{}            `json:"is_real" form:"is_real"` //ios定义为bool，android定义为int，fxxk
 	IsBaidu            int16                  `json:"is_baidu" form:"is_baidu"`
 	GoalValue          int                    `json:"goal_value" form:"goal_value"`
 	GoalType           int                    `json:"goal_type" form:"goal_type"`
@@ -70,7 +70,7 @@ type PostData struct {
 	TotalCalories      float64                `json:"total_calories" form:"total_calories"`
 	ActivityResult     int                    `json:"activity_result" form:"activity_result"`
 	ActivityType       int                    `json:"activity_type" form:"activity_type"`
-	BaiduCloud         bool                   `json:"baidu_cloud" form:"baidu_cloud"`
+	BaiduCloud         interface{}            `json:"baidu_cloud" form:"baidu_cloud"` //ios定义为bool，android定义为int，fxxk
 	HighestSpeedPerkm  float64                `json:"highest_speed_perkm" form:"highest_speed_perkm"`
 	CustomWords        string                 `json:"custom_words" form:"custom_words"`
 	CaloriesPerm       []int                  `json:"calories_per_m" form:"calories_per_m"`
