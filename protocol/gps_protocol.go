@@ -89,19 +89,19 @@ type PostData struct {
 }
 
 type Point struct {
-	ToPreviousEnergy   float64 `json:topreviousenergy"`
-	ToPreviousCostTime int     `json:"topreviouscostTime"`
-	ToPreviousSpeed    float64 `json:"topreviousspeed"`
-	ToStartDistance    float64 `json:"tostartdistance"`
-	ToStartCostTime    float64 `json:"tostartcostTime"`
-	Distance           float64 `json:"distance"`
-	Longitude          float64 `json:"longitude"`
-	Latitude           float64 `json:"latitude"`
-	Elevation          float64 `json:"elevation"`
-	HAccuracy          float64 `json:"hAccuracy"`
-	VAccuracy          float64 `json:"vAccuracy"`
-	Type               int     `json:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
-	TimeStamp          string  `json:"time_stamp"`
+	ToPreviousEnergy   float64 `json:"topreviousenergy" form:"topreviousenergy"`
+	ToPreviousCostTime int     `json:"topreviouscostTime" form:"topreviouscostTime"`
+	ToPreviousSpeed    float64 `json:"topreviousspeed" form:"topreviousspeed"`
+	ToStartDistance    float64 `json:"tostartdistance" form:"tostartdistance"`
+	ToStartCostTime    float64 `json:"tostartcostTime" form:"tostartcostTime"`
+	Distance           float64 `json:"distance" form:"distance"`
+	Longitude          float64 `json:"longitude" form:"longitude"`
+	Latitude           float64 `json:"latitude" form:"latitude"`
+	Elevation          float64 `json:"elevation" form:"elevation"`
+	HAccuracy          float64 `json:"hAccuracy" form:"hAccuracy"`
+	VAccuracy          float64 `json:"vAccuracy" form:"vAccuracy"`
+	Type               int     `json:"type" form:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
+	TimeStamp          string  `json:"time_stamp" form:"time_stamp"`
 }
 
 type UseTimePerKm struct {
