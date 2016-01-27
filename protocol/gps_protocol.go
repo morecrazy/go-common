@@ -105,10 +105,16 @@ type Point struct {
 }
 
 type UseTimePerKm struct {
-	TotalUseTime float64 `json:"totalUseTime"`
-	UseTime      float64 `json:"useTime"`
-	Speed        float64 `json:"speed"`
-	Distance     float64 `json:"distance"`
+	TotalUseTime float64    `json:"totalUseTime" form:"totalUseTime"`
+	UseTime      float64    `json:"useTime" form:"useTime"`
+	AtLocation   AtLocation `json:"atLocation" form:"atLocation"`
+	Speed        float64    `json:"speed" form:"speed"`
+	Distance     float64    `json:"distance" form:"distance"`
+}
+
+type AtLocation struct {
+	Longitude float64 `json:"longitude" form:"longitude"`
+	Latitude  float64 `json:"latitude" form:"latitude"`
 }
 
 type UserStepPerM struct {
