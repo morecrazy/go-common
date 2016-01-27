@@ -25,7 +25,7 @@ func InitDbPool(config *MysqlConfig) (*sql.DB, error) {
 	return dbPool, nil
 }
 
-func InitGormDbPool(config *MysqlConfig) (*gorm.DB, error) {
+func InitGormDbPool(config *MysqlConfig, setLog bool) (*gorm.DB, error) {
 
 	db, err := gorm.Open("mysql", config.MysqlConn)
 	if err != nil {
@@ -35,9 +35,10 @@ func InitGormDbPool(config *MysqlConfig) (*gorm.DB, error) {
 
 	db.DB().SetMaxOpenConns(config.MysqlConnectPoolSize)
 	db.DB().SetMaxIdleConns(config.MysqlConnectPoolSize)
-	db.LogMode(true)
-	//	db.SetLogger(Logger)
-	db.SetLogger(Logger)
+	if setLog {
+		db.LogMode(true)
+		db.SetLogger(Logger)
+	}
 	db.SingularTable(true)
 
 	err = db.DB().Ping()
