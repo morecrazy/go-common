@@ -113,8 +113,8 @@ type UseTimePerKm struct {
 }
 
 type AtLocation struct {
-	Longitude float64 `json:"longitude" form:"longitude"`
-	Latitude  float64 `json:"latitude" form:"latitude"`
+	Longitude float64 `json:"longitude" pickle:"longitude"`
+	Latitude  float64 `json:"latitude" pickle:"latitude"`
 }
 
 type UserStepPerM struct {
