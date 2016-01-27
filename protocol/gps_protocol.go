@@ -60,12 +60,12 @@ type PostData struct {
 	IsOpen             int16                  `json:"is_open" form:"is_open"`
 	IsReal             interface{}            `json:"is_real" form:"is_real"` //ios定义为bool，android定义为int，fxxk
 	IsBaidu            int16                  `json:"is_baidu" form:"is_baidu"`
-	GoalValue          int                    `json:"goal_value" form:"goal_value"`
+	GoalValue          interface{}            `json:"goal_value" form:"goal_value"` //ios定义为int，android定义为float，fxxk
 	GoalType           int                    `json:"goal_type" form:"goal_type"`
 	StageDes           string                 `json:"stage_des" form:"stage_des"`
 	MaxAltitude        float64                `json:"MaxAltitude" form:"MaxAltitude"`
 	MaxToPreviousSpeed float64                `json:"MaxToPreviousSpeed" form:"MaxToPreviousSpeed"`
-	TotalTime          int                    `json:"total_time" form:"total_time"`
+	TotalTime          interface{}            `json:"total_time" form:"total_time"` //ios定义为int，android定义为float，fxxk
 	TotalLength        float64                `json:"total_length" form:"total_length`
 	TotalCalories      float64                `json:"total_calories" form:"total_calories"`
 	ActivityResult     int                    `json:"activity_result" form:"activity_result"`
