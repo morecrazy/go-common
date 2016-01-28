@@ -84,8 +84,8 @@ type PostData struct {
 	Points             []Point                `json:"points" form:"points"`
 	HeartRate          map[string]interface{} `json:"heart_rate" form:"heart_rate"`
 	GreenwayId         string                 `json:"greenway_id" form:"greenway_id"`
-	HalfMarathon       int                    `json:"half_marathon" form:"half_marathon"`
-	Marathon           int                    `json:"marathon" form:"marathon"`
+	HalfMarathon       interface{}            `json:"half_marathon" form:"half_marathon"` //ios定义为float，android定义为int，fxxk
+	Marathon           interface{}            `json:"marathon" form:"marathon"`           //ios定义为float，android定义为int，fxxk
 }
 
 type Point struct {
