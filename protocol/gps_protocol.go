@@ -90,7 +90,7 @@ type PostData struct {
 	ReleaseVersion           interface{}            `json:"release_version" form:"release_version"`                         //可能是android专用
 	StartDateTime            interface{}            `json:"StartDateTime" form:"StartDateTime"`                             //可能是android专用
 	EndDateTime              interface{}            `json:"EndDateTime" form:"EndDateTime"`                                 //可能是android专用
-	TotalTime                interface{}            `json:"TotalTime" form:"TotalTime"`                                     //可能是android专用
+	TotalTime1               interface{}            `json:"TotalTime" form:"TotalTime"`                                     //可能是android专用
 	IsRoot                   interface{}            `json:"is_root" form:"is_root"`                                         //可能是android专用
 	Locationcount            interface{}            `json:"locationcount" form:"locationcount"`                             //可能是android专用
 	IsCrashRestore           interface{}            `json:"is_crash_restore" form:"is_crash_restore"`                       //可能是android专用
