@@ -73,7 +73,7 @@ type PostData struct {
 	BaiduCloud         interface{}            `json:"baidu_cloud" form:"baidu_cloud"` //ios定义为bool，android定义为int，fxxk
 	HighestSpeedPerkm  float64                `json:"highest_speed_perkm" form:"highest_speed_perkm"`
 	CustomWords        string                 `json:"custom_words" form:"custom_words"`
-	CaloriesPerm       []int                  `json:"calories_per_m" form:"calories_per_m"`
+	CaloriesPerm       []float64              `json:"calories_per_m" form:"calories_per_m"`
 	ProgramName        string                 `json:"program_name" form:"program_name"`
 	Model              string                 `json:"model" form:"model"`
 	LastOfProgram      int                    `json:"last_of_program" form:"last_of_program"`
