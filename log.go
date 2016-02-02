@@ -61,7 +61,7 @@ func InitLogger(process_name, format_str string) (*logging.Logger, error) {
 	}
 
 	backend_err_leveld := logging.AddModuleLevel(backend_err_formatter)
-	backend_err_leveld.SetLevel(logging.ERROR, "")
+	backend_err_leveld.SetLevel(logging.WARNING, "")
 
 	logging.SetBackend(backend_info_leveld, backend_err_leveld)
 
