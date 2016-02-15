@@ -60,7 +60,7 @@ func (cache *Cache) NewRedisPool(my_redis *RedisConfig) {
 			c, err := redis.DialTimeout("tcp", my_redis.RedisConn, connect_timeout, read_timeout, write_timeout)
 
 			if err != nil {
-				fmt.Println("DialTimeout")
+				fmt.Println("DialTimeout", my_redis.RedisConn)
 				return nil, err
 			}
 			if len(my_redis.RedisPasswd) > 0 {
