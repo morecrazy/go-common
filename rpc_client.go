@@ -179,7 +179,7 @@ func ProcRouteLog(routeId, userId string, postData map[string]interface{}) (Save
 		},
 	}
 	//	Logger.Debug("ProcRouteLog arg %v", args)
-	err := RouteServerClinet.Call("save_routelog", &args, &reply)
+	err := RouteServerClinet.Call("process_routelog", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
 		err = NewInternalError(RPCErrCode, err)

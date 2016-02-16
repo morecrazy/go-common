@@ -23,5 +23,5 @@ type SaveRouteLogRes struct {
 
 var RouteServerRpcFuncMap map[string]string = map[string]string{
 	"simplify_proc_route_log": "RouteHandler.SimplifyProcRouteLog",
-	"save_routelog":           "RouteHandler.SaveRouteLog",
+	"process_routelog":           "RouteHandler.ProcessRouteLog",
 }
