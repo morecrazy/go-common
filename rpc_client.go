@@ -38,6 +38,17 @@ func InitRpcClient() error {
 	return nil
 }
 
+// 只使用 GetProfile的接口，单独初始化
+func InitProfileClient(addr string, net string) error {
+	var err error
+	UserProfileClient, err = NewRpcClient(addr, net, UserprofileRpcFuncMap, "userprofile", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetProfileById(userId string) (UserProfile, error) {
 	var reply UserprofileDefaultReply
 	args := UserprofileDefaultArgs{
@@ -46,7 +57,9 @@ func GetProfileById(userId string) (UserProfile, error) {
 	//	Logger.Debug("GetProfileById %v", args)
 	err := UserProfileClient.Call("get", &args, &reply)
 	if err != nil {
-		Logger.Error(err.Error())
+		if nil != Logger {
+			Logger.Error(err.Error())
+		}
 		err = NewInternalError(RPCErrCode, err)
 	}
 
@@ -60,7 +73,9 @@ func BatchGetProfileByIds(userIds []string) (UserprofileList, error) {
 	}
 	err := UserProfileClient.Call("batch_get", &args, &reply)
 	if err != nil {
-		Logger.Error(err.Error())
+		if nil != Logger {
+			Logger.Error(err.Error())
+		}
 		err = NewInternalError(RPCErrCode, err)
 	}
 	return reply.Users, err
