@@ -10,6 +10,8 @@ import (
 	//"time"
 )
 
+var RawData []byte
+
 func NewEtcdApi(addrs []string) (etcd.KeysAPI, error) {
 	cfg := etcd.Config{
 		Endpoints: addrs,
@@ -48,6 +50,7 @@ func LoadCfgFromEtcd(addrs []string, service, env string, cfg interface{}) error
 	if err != nil {
 		return err
 	}
+	RawData = []byte(data)
 
 	return json.Unmarshal([]byte(data), cfg)
 }
