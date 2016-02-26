@@ -52,11 +52,15 @@ func (client *RpcClient) Connect() (*rpc.Client, error) {
 
 func (client *RpcClient) Call(method string, args interface{}, reply interface{}) error {
 	if "add_picture" != method {
-		client.logger.Debug("call rpc : %s, %v", method, args)
+		if nil != client.logger {
+			client.logger.Debug("call rpc : %s, %v", method, args)
+		}
 	}
 	rpc_client, err := client.pool.Get()
 	if err != nil {
-		client.logger.Error("get %s rpc client error :%v", client.name, err)
+		if nil != client.logger {
+			client.logger.Error("get %s rpc client error :%v", client.name, err)
+		}
 		return err
 	}
 	defer rpc_client.Close()
@@ -64,9 +68,13 @@ func (client *RpcClient) Call(method string, args interface{}, reply interface{}
 	if err != nil {
 		is_user_err, _, _ := IsUserErr(err)
 		if is_user_err {
-			client.logger.Notice("call %s rpc client err :%s,%v", client.name, method, err)
+			if nil != client.logger {
+				client.logger.Notice("call %s rpc client err :%s,%v", client.name, method, err)
+			}
 		} else {
-			client.logger.Error("call %s rpc client err :%s,%v", client.name, method, err)
+			if nil != client.logger {
+				client.logger.Error("call %s rpc client err :%s,%v", client.name, method, err)
+			}
 		}
 	}
 
