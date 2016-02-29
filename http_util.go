@@ -34,9 +34,11 @@ var sliceOfStrings = reflect.TypeOf([]string(nil))
 func FormatUserAgent(user_agent string) map[string]interface{} {
 	dealed_user_agent := strings.TrimSpace(strings.ToLower(user_agent))
 	result := map[string]interface{}{
-		"version":      "0.0.0",
-		"iner_version": 0,
-		"platform":     0,
+		"version":          "0.0.0",
+		"iner_version":     0,
+		"platform":         0,
+		"platfrom_version": "",
+		"device_type":      "",
 	}
 
 	if !strings.Contains(dealed_user_agent, "codoonsport(") {
@@ -53,12 +55,111 @@ func FormatUserAgent(user_agent string) map[string]interface{} {
 	if array_user_agent == nil {
 		return result
 	}
-	ver_list := strings.Split(strings.Split(array_user_agent[0], ";")[0], " ")
-	result["version"] = ver_list[0]
-	result["iner_version"] = ver_list[1]
-	result["platform"] = platform
-	return result
 
+	ver_list := strings.Split(array_user_agent[0], ";")
+	if len(ver_list) != 3 {
+		// 长度有误则为非法agent
+		return result
+	}
+	app_version := strings.Split(ver_list[0], " ")
+	platfrom_version := strings.Split(ver_list[1], " ")
+	result["version"] = app_version[0]
+	result["iner_version"] = app_version[1]
+	result["platform"] = platform
+	result["platform_version"] = platfrom_version[1]
+	result["device_type"] = ver_list[2]
+	return result
+}
+
+// Compare codoon app version
+func CompareVersion(version_a string, version_b string, oper int) (bool, error) {
+	// oper:(0, u'>'), (1, u'>='), (2, u'=='), (3, u'<'), (4, u'<='), (other, u'不限制')
+	if oper == -1 {
+		return true, nil
+	}
+	int_list_a := []int{}
+	int_list_b := []int{}
+	err := StringToIntList(version_a, &int_list_a)
+	if err != nil {
+		fmt.Errorf("Version format error[version:%v]", version_a)
+		return false, err
+	}
+	err = StringToIntList(version_b, &int_list_b)
+	if err != nil {
+		fmt.Errorf("Version format error[version:%v]", version_b)
+		return false, err
+	}
+	if oper == 0 {
+		for i := 0; i < len(int_list_a); i++ {
+			if int_list_a[i] > int_list_b[i] {
+				return true, nil
+			} else if int_list_a[i] < int_list_b[i] {
+				return false, nil
+			} else {
+				continue
+			}
+		}
+		return false, nil
+	} else if oper == 1 {
+		for i := 0; i < 3; i++ {
+			if int_list_a[i] > int_list_b[i] {
+				return true, nil
+			} else if int_list_a[i] < int_list_b[i] {
+				return false, nil
+			} else {
+				continue
+			}
+		}
+		return true, nil
+	} else if oper == 2 {
+		for i := 0; i < 3; i++ {
+			if int_list_a[i] > int_list_b[i] {
+				return false, nil
+			} else if int_list_a[i] < int_list_b[i] {
+				return false, nil
+			} else {
+				continue
+			}
+		}
+		return true, nil
+	} else if oper == 3 {
+		for i := 0; i < 3; i++ {
+			if int_list_a[i] > int_list_b[i] {
+				return false, nil
+			} else if int_list_a[i] < int_list_b[i] {
+				return true, nil
+			} else {
+				continue
+			}
+		}
+		return false, nil
+	} else if oper == 4 {
+		for i := 0; i < 3; i++ {
+			if int_list_a[i] > int_list_b[i] {
+				return false, nil
+			} else if int_list_a[i] < int_list_b[i] {
+				return true, nil
+			} else {
+				continue
+			}
+		}
+		return true, nil
+	} else {
+		return true, nil
+	}
+}
+
+func StringToIntList(s string, int_list *[]int) error {
+	string_list := strings.Split(s, ".")
+	for _, value := range string_list {
+		i, err := strconv.Atoi(value)
+		if err != nil {
+			fmt.Println("Convert error[%d]", value)
+			return err
+		}
+		*int_list = append(*int_list, i)
+	}
+	return nil
 }
 
 // parse form values to struct via tag.
