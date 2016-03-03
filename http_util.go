@@ -1,7 +1,6 @@
 package common
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
