@@ -336,7 +336,10 @@ func SendResponse(c *gin.Context, http_code int, data interface{}, err error) er
 }
 
 func SendRequest(http_method, urls string, req_body interface{}, req_form map[string]string) (int, string, error) {
-	client := &http.Client{}
+	tr := &http.Transport{
+		DisableKeepAlives: true,
+	}
+	client := &http.Client{Transport: tr}
 	form := url.Values{}
 	var err error = nil
 	var request *http.Request
