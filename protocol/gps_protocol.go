@@ -110,6 +110,7 @@ type Point struct {
 	VAccuracy          float64 `json:"vAccuracy" pickle:"vAccuracy"`
 	Type               int     `json:"type" pickle:"type"` //type 0: PROGRESS 1:SUSPEND else:RESTART
 	TimeStamp          string  `json:"time_stamp" pickle:"time_stamp"`
+	Steps              float64 `json:"-" pickle:"-"`
 }
 
 type UseTimePerKm struct {
