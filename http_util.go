@@ -13,6 +13,7 @@ import (
 	"third/gin"
 	"third/httprouter"
 	"time"
+	"bytes"
 )
 
 func CodoonGetHeader(c *gin.Context) {
@@ -335,7 +336,7 @@ func SendResponse(c *gin.Context, http_code int, data interface{}, err error) er
 	return err
 }
 
-func SendRequest(http_method, urls string, req_body interface{}, req_form map[string]string) (int, string, error) {
+func SendRequest(http_method, urls string, req_body interface{}, req_form map[string]string, req_raw interface{}) (int, string, error) {
 	tr := &http.Transport{
 		DisableKeepAlives: true,
 	}
@@ -360,6 +361,14 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 			request, _ = http.NewRequest(http_method, urls, strings.NewReader(form.Encode()))
 		}
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	} else if nil != req_raw {
+		var query = []byte(req_raw.(string))
+		request, _ = http.NewRequest(http_method, urls, bytes.NewBuffer(query))
+		request.Header.Set("Content-Type", "text/plain")
+	}
+
+	if nil == req_body && nil == req_form && nil == req_raw {
+		request, _ = http.NewRequest(http_method, urls, nil)
 	}
 
 	Logger.Debug("request %v", request)
@@ -387,11 +396,15 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 }
 
 func SendFormRequest(http_method, urls string, req_form map[string]string) (int, string, error) {
-	return SendRequest(http_method, urls, nil, req_form)
+	return SendRequest(http_method, urls, nil, req_form, nil)
 }
 
 func SendJsonRequest(http_method, urls string, req_body interface{}) (int, string, error) {
-	return SendRequest(http_method, urls, req_body, nil)
+	return SendRequest(http_method, urls, req_body, nil, nil)
+}
+
+func SendRawRequest(http_method, urls string, req_raw interface{})(int, string, error) {
+	return SendRequest(http_method, urls, nil, nil, req_raw)
 }
 
 func SMSSendRequest(http_method, urls string, req_body map[string]string) (int, string, error) {
