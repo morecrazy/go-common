@@ -420,6 +420,54 @@ func SMSSendRequest(http_method, urls string, req_body map[string]string) (int, 
 	return code, result, err
 }
 
+
+func SendRequestSecure(http_method, urls string, req_form map[string]string, secret string) (int, string, error) {
+	tr := &http.Transport{
+		DisableKeepAlives: true,
+	}
+	client := &http.Client{Transport: tr}
+	form := url.Values{}
+	var err error = nil
+	var request *http.Request
+	var body []byte
+
+	if nil != req_form {
+		for key, value := range req_form {
+			form.Set(key, value)
+		}
+		if "GET" == http_method {
+			request, _ = http.NewRequest(http_method, urls+"?"+form.Encode(), nil)
+		} else {
+			request, _ = http.NewRequest(http_method, urls, strings.NewReader(form.Encode()))
+		}
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		request.Header.Set("Authorization", secret)
+	}
+
+	Logger.Debug("request %v", request)
+
+	response, err := client.Do(request)
+	if nil != err {
+		err = NewInternalError(HttpErrCode, err)
+		Logger.Error("send request err :%v", err)
+		return http.StatusNotFound, "", err
+	}
+
+	if response.StatusCode == http.StatusOK {
+		defer response.Body.Close()
+		body, err = ioutil.ReadAll(response.Body)
+		if nil == err {
+			Logger.Debug("body:%v", string(body))
+		}
+		return response.StatusCode, string(body), err
+	} else {
+		err = NewInternalError(HttpErrCode, fmt.Errorf("http code :%d", response.StatusCode))
+		Logger.Error("send request err :%v", err)
+		return response.StatusCode, "", err
+	}
+
+}
+
 var string_key map[string]int = map[string]int{
 	"key":  1,
 	"nick": 1,
