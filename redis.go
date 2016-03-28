@@ -438,6 +438,16 @@ func (cache *Cache) Rpush(key string, value interface{}) error {
 	return err
 }
 
+func (cache *Cache) Rpop(key string) (value interface{}, err error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	value, err = conn.Do("RPOP", key)
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return
+}
+
 func (cache *Cache) RpushBatch(keys []interface{}) error {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
