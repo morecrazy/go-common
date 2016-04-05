@@ -491,3 +491,28 @@ func (cache *Cache) Publish(channel, msg string) error {
 	_, err := conn.Do("PUBLISH", channel, msg)
 	return err
 }
+
+//Set the value of key ``name`` to ``value`` that expires in ``time`` seconds
+func (cache *Cache) Setex(name string, value, time int64) error {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	_, err := conn.Do("SETEX", name, time, value)
+	return err
+}
+
+func (cache *Cache) SetTimeLock(id string, time_out int64) (flag bool, err error) {
+	key := fmt.Sprintf("tlock:%s", id)
+	is_exist := cache.Exists(key)
+	if err != nil {
+		return
+
+	}
+	if is_exist {
+		return
+	}
+	if err = cache.Setex(key, 0, time_out); err != nil {
+		return
+	}
+	flag = true
+	return
+}
