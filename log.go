@@ -32,8 +32,12 @@ func InitLogger(process_name, format_str string) (*logging.Logger, error) {
 	if err != nil {
 		fmt.Println("open file[%s] failed[%s]", Config.LogFile, err)
 		return nil, err
+	}else {
+		fmt.Println("open 11111111")
 	}
-
+	for i := 0; i < 10000000; i++ {
+		info_log_fp.Write([]byte("adsfawefaewfawefawef"))
+	}
 	//err_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log.wf", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	err_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.wf",true,2000)
 	if err != nil {
