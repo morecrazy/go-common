@@ -1,5 +1,7 @@
 package protocol
 
+import "time"
+
 type UserVipLabel struct {
 	Id        int    `json:"id" gorm:"primary_key;column:id" sql:"auto_incremnet" pickle:"id"`
 	Desc      string `gorm:"column:desc" json:"viplabel_desc";sql:type:"longtext" pickle:"viplabel_desc"`
@@ -48,6 +50,7 @@ type UserProfile struct {
 	Is_vip           bool              `json:"is_vip" pickle:"is_vip"`
 	PortraitMap      map[string]string `json:"portrait_map"`
 	VipLabel         UserVipLabel      `json:"vip_label"`
+	MobileUpdateTime time.Time         `json:mobileupdatetime`
 }
 
 type UserprofileList []UserProfile
