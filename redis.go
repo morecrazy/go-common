@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 	"third/redigo/redis"
 	"time"
@@ -303,16 +302,13 @@ func (cache *Cache) Exists(key string) (bool, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
 	var flag bool
-	exists, err := conn.Do("EXISTS", key)
+	exists, err := redis.Int(conn.Do("EXISTS", key))
 	if err != nil && !strings.Contains(err.Error(), "nil returned") {
 		err = NewInternalError(CacheErrCode, err)
 		Logger.Error(err.Error())
 		return flag, err
 	}
-	value_exist := reflect.ValueOf(exists)
-	i_exists := value_exist.Int()
-
-	if i_exists == 1 {
+	if exists == 1 {
 		flag = true
 	}
 	return flag, nil
