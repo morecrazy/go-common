@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"third/redigo/redis"
 	"time"
@@ -298,21 +299,23 @@ func (cache *Cache) Del(key string) error {
 	return err
 }
 
-func (cache *Cache) Exists(key string) bool {
+func (cache *Cache) Exists(key string) (bool, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
-	exists, err := redis.Bool(conn.Do("EXISTS", key))
-	if err != nil {
+	var flag bool
+	exists, err := conn.Do("EXISTS", key)
+	if err != nil && !strings.Contains(err.Error(), "nil returned") {
 		err = NewInternalError(CacheErrCode, err)
 		Logger.Error(err.Error())
-		return false
+		return flag, err
 	}
+	value_exist := reflect.ValueOf(exists)
+	i_exists := value_exist.Int()
 
-	if exists {
-		return true
-	} else {
-		return false
+	if i_exists == 1 {
+		flag = true
 	}
+	return flag, nil
 }
 
 func (cache *Cache) Zrange(key string, start, end int, withscores bool) ([]string, error) {
@@ -502,10 +505,9 @@ func (cache *Cache) Setex(name string, value, time int64) error {
 
 func (cache *Cache) SetTimeLock(id string, time_out int64) (flag bool, err error) {
 	key := fmt.Sprintf("tlock:%s", id)
-	is_exist := cache.Exists(key)
+	is_exist, err := cache.Exists(key)
 	if err != nil {
 		return
-
 	}
 	if is_exist {
 		return
