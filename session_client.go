@@ -58,7 +58,7 @@ func GetUserIdBySession(sessionId string) string {
 		fmt.Println("session_user fetch response failed.")
 		return ""
 	}
-	fmt.Println(result)
+	//	fmt.Println(result)
 	err = json.Unmarshal(result, &ret)
 	fmt.Println(ret)
 	return ret.Data["user_id"]
