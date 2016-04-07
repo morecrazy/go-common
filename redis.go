@@ -491,6 +491,13 @@ func (cache *Cache) Publish(channel, msg string) error {
 	return err
 }
 
+func (cache *Cache) Llen(key string) (key_len int, err error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	key_len, err = redis.Int(conn.Do("LLEN", key))
+	return
+}
+
 //Set the value of key ``name`` to ``value`` that expires in ``time`` seconds
 func (cache *Cache) Setex(name string, value, time int64) error {
 	conn := cache.RedisPool().Get()
