@@ -20,10 +20,8 @@ type SessionInfo struct {
 
 func SetSessionByToken(token string) string {
 	environment := os.Getenv("GOENV")
-	url := "https://xmall_test.codoon.com/xmall/tokensession?token=%s"
-	if environment == "ONLINE" {
-		url = "https://xmall.codoon.com/xmall/tokensession?token=%s"
-	}
+	url = "https://xmall.codoon.com/xmall/tokensession?token=%s"
+
 	next_url := fmt.Sprintf(url, token)
 	res, err := http.Get(next_url)
 	if err != nil {
@@ -41,10 +39,7 @@ func SetSessionByToken(token string) string {
 
 func GetUserIdBySession(sessionId string) string {
 	environment := os.Getenv("GOENV")
-	url := "https://xmall_test.codoon.com/xmall/get_userid_by_sessionid?sessionid=%s"
-	if environment == "ONLINE" {
-		url = "https://xmall.codoon.com/xmall/get_userid_by_sessionid?sessionid=%s"
-	}
+	url = "https://xmall.codoon.com/xmall/get_userid_by_sessionid?sessionid=%s"
 	next_url := fmt.Sprintf(url, sessionId)
 	res, err := http.Get(next_url)
 	if err != nil {
