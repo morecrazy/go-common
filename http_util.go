@@ -46,9 +46,9 @@ func FormatUserAgent(user_agent string) map[string]interface{} {
 		return result
 	}
 
-	var platform = 1
+	var platform = 0
 	if strings.Contains(dealed_user_agent, "ios") {
-		platform = 0
+		platform = 1
 	}
 
 	dealed_user_agent = strings.Replace(dealed_user_agent, "codoonsport(", "", -1)
