@@ -80,6 +80,15 @@ func CompareVersion(version_a string, version_b string, oper int) (bool, error) 
 	}
 	int_list_a := []int{}
 	int_list_b := []int{}
+
+	if version_a == "" {
+		version_a = "0.0.0"
+	}
+
+	if version_b == "" {
+		version_b = "0.0.0"
+	}
+
 	err := StringToIntList(version_a, &int_list_a)
 	if err != nil {
 		fmt.Errorf("Version format error[version:%v]", version_a)
