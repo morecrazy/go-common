@@ -203,7 +203,7 @@ func ProcRouteLog(routeId, userId string, postData map[string]interface{}) (Save
 	return reply, err
 }
 
-func DeleteRoute(routeId, userId string, postData map[string]interface{}) (DeleteRouteRes, error) {
+func DeleteRoute(routeId, userId string) (DeleteRouteRes, error) {
 	var reply DeleteRouteRes
 	args := DeleteRouteReq{
 		RouteId: routeId,
