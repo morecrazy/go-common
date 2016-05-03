@@ -18,7 +18,7 @@ func InitLogger(process_name, format_str string) (*logging.Logger, error) {
 
 	Logger = logging.MustGetLogger(process_name)
 	//sql_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log.mysql", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	sql_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.mysql",true, 1024 * 1024 * 1024)
+	sql_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.mysql", true, 1024*1024*1024)
 	if err != nil {
 		fmt.Println("open file[%s.mysql] failed[%s]", Config.LogFile, err)
 		return nil, err
@@ -27,14 +27,14 @@ func InitLogger(process_name, format_str string) (*logging.Logger, error) {
 	MysqlLogger = log.New(sql_log_fp, "", log.Ldate|log.Ltime|log.Lmicroseconds|log.Lshortfile)
 
 	//info_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	info_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log",true, 1024 * 1024 * 1024)
+	info_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log", true, 1024*1024*1024)
 	if err != nil {
 		fmt.Println("open file[%s] failed[%s]", Config.LogFile, err)
 		return nil, err
 	}
 
 	//err_log_fp, err := os.OpenFile(Config.LogDir+"/"+process_name+".log.wf", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	err_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.wf",true, 1024 * 1024 * 1024)
+	err_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.wf", true, 1024*1024*1024)
 	if err != nil {
 		fmt.Println("open file[%s.wf] failed[%s]", Config.LogFile, err)
 		return nil, err

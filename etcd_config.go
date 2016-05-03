@@ -40,7 +40,7 @@ func CfgFromEtcd(api etcd.KeysAPI, service, env string) (string, error) {
 	return rsp.Node.Value, nil
 }
 
-func LoadCfgFromEtcd(addrs []string, service string,  cfg interface{}) error {
+func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 	api, err := NewEtcdApi(addrs)
 	if err != nil {
 		return err
