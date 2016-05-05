@@ -94,10 +94,16 @@ func CompareVersion(version_a string, version_b string, oper int) (bool, error) 
 		fmt.Errorf("Version format error[version:%v]", version_a)
 		return false, err
 	}
+	for len(int_list_a) < 3 {
+		int_list_a = append(int_list_a, 0)
+	}
 	err = StringToIntList(version_b, &int_list_b)
 	if err != nil {
 		fmt.Errorf("Version format error[version:%v]", version_b)
 		return false, err
+	}
+	for len(int_list_b) < 3 {
+		int_list_b = append(int_list_b, 0)
 	}
 	if oper == 0 {
 		for i := 0; i < len(int_list_a); i++ {
