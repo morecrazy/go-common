@@ -25,7 +25,7 @@ type RouteData struct {
 	UserId        string        `json:"user_id"`
 	UseTtimePerKm []interface{} `json:"usettime_per_km"`
 	RouteLine     []interface{} `json:"route_line"`
-	Points        []interface{} `json"points"`
+	Points        []interface{} `json:"points"`
 }
 
 type RouteDayDetail struct {
@@ -66,7 +66,7 @@ type PostData struct {
 	MaxAltitude              float64                `json:"MaxAltitude" form:"MaxAltitude"`
 	MaxToPreviousSpeed       float64                `json:"MaxToPreviousSpeed" form:"MaxToPreviousSpeed"`
 	TotalTime                interface{}            `json:"total_time" form:"total_time"` //ios定义为int，android定义为float
-	TotalLength              float64                `json:"total_length" form:"total_length`
+	TotalLength              float64                `json:"total_length" form:"total_length"`
 	TotalCalories            float64                `json:"total_calories" form:"total_calories"`
 	ActivityResult           int                    `json:"activity_result" form:"activity_result"`
 	ActivityType             int                    `json:"activity_type" form:"activity_type"`

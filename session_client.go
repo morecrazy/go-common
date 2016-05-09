@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
+)
+
+const (
+	MALL_DOMAIN string = "http://mall.in.codoon.com"
 )
 
 type SessionStatus struct {
@@ -19,12 +22,8 @@ type SessionInfo struct {
 }
 
 func SetSessionByToken(token string) string {
-	environment := os.Getenv("GOENV")
-	url := "https://xmall_test.codoon.com/xmall/tokensession?token=%s"
-	if environment == "ONLINE" {
-		url = "https://xmall.codoon.com/xmall/tokensession?token=%s"
-	}
-	next_url := fmt.Sprintf(url, token)
+	api := "/xmall/tokensession?token=%s"
+	next_url := fmt.Sprintf(MALL_DOMAIN+api, token)
 	res, err := http.Get(next_url)
 	if err != nil {
 		fmt.Println("token-session connection error.")
@@ -40,12 +39,8 @@ func SetSessionByToken(token string) string {
 }
 
 func GetUserIdBySession(sessionId string) string {
-	environment := os.Getenv("GOENV")
-	url := "https://xmall_test.codoon.com/xmall/get_userid_by_sessionid?sessionid=%s"
-	if environment == "ONLINE" {
-		url = "https://xmall.codoon.com/xmall/get_userid_by_sessionid?sessionid=%s"
-	}
-	next_url := fmt.Sprintf(url, sessionId)
+	api := "/xmall/get_userid_by_sessionid?sessionid=%s"
+	next_url := fmt.Sprintf(MALL_DOMAIN+api, sessionId)
 	res, err := http.Get(next_url)
 	if err != nil {
 		fmt.Println("token-session connection error.")

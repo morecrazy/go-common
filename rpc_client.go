@@ -203,6 +203,22 @@ func ProcRouteLog(routeId, userId string, postData map[string]interface{}) (Save
 	return reply, err
 }
 
+func DeleteRoute(routeId, userId string) (DeleteRouteRes, error) {
+	var reply DeleteRouteRes
+	args := DeleteRouteReq{
+		RouteId: routeId,
+		UserId:  userId,
+	}
+	//	Logger.Debug("ProcRouteLog arg %v", args)
+	err := RouteServerClinet.Call("delete_route", &args, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		err = NewInternalError(RPCErrCode, err)
+	}
+
+	return reply, err
+}
+
 func UpdateSportInfo(userId, curDay string, daySummary, weekSummary, monthSummary, yearSummary, allSummary float64) (UpdateUserSportInfoResp, error) {
 	var reply UpdateUserSportInfoResp
 	args := UpdateUserSportInfoReq{

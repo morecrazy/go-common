@@ -80,15 +80,30 @@ func CompareVersion(version_a string, version_b string, oper int) (bool, error) 
 	}
 	int_list_a := []int{}
 	int_list_b := []int{}
+
+	if version_a == "" {
+		version_a = "0.0.0"
+	}
+
+	if version_b == "" {
+		version_b = "0.0.0"
+	}
+
 	err := StringToIntList(version_a, &int_list_a)
 	if err != nil {
 		fmt.Errorf("Version format error[version:%v]", version_a)
 		return false, err
 	}
+	for len(int_list_a) < 3 {
+		int_list_a = append(int_list_a, 0)
+	}
 	err = StringToIntList(version_b, &int_list_b)
 	if err != nil {
 		fmt.Errorf("Version format error[version:%v]", version_b)
 		return false, err
+	}
+	for len(int_list_b) < 3 {
+		int_list_b = append(int_list_b, 0)
 	}
 	if oper == 0 {
 		for i := 0; i < len(int_list_a); i++ {
