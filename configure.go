@@ -68,21 +68,21 @@ func (config Configure) String() string {
 }
 */
 func InitConfigFile(filename string, config *Configure) error {
-	var environment = os.Getenv("GOENV")
-
-	fmt.Println("environment", environment)
-	switch environment {
-	case "DEV":
-		filename = filename + ".dev"
-	case "TEST":
-		filename = filename + ".test"
-	case "PRE":
-		filename = filename + ".pre"
-	case "ONLINE":
-		filename = filename + ".online"
-	default:
-		filename = filename + ".test"
-	}
+	//var environment = os.Getenv("GOENV")
+	//
+	//fmt.Println("environment", environment)
+	//switch environment {
+	//case "DEV":
+	//	filename = filename + ".dev"
+	//case "TEST":
+	//	filename = filename + ".test"
+	//case "PRE":
+	//	filename = filename + ".pre"
+	//case "ONLINE":
+	//	filename = filename + ".online"
+	//default:
+	//	filename = filename + ".test"
+	//}
 
 	fmt.Println("filename", filename)
 	fi, err := os.Stat(filename)
