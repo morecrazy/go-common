@@ -91,3 +91,13 @@ func GinSlowLogger(slog SlowLogger, threshold time.Duration) gin.HandlerFunc {
 		}
 	}
 }
+
+const CODOON_REQUEST_ID = "codoon_request_id"
+
+func GinServiceCoder(code string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if code != "" {
+			c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+code)
+		}
+	}
+}
