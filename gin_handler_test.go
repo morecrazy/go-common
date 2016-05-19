@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"third/gin"
+	"time"
 
 	"testing"
 )
@@ -17,6 +18,7 @@ func ginServer() {
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
 	go engine.Run(GIN_SERVER_ADDR)
+	time.Sleep(2 * time.Second)
 }
 
 type HiReq struct {

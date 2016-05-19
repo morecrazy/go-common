@@ -13,10 +13,11 @@ import (
 	"time"
 )
 
-// ReqData2Form try to parse request body as json, if failed, deal with it as form.
+// ReqData2Form try to parse request body as json and inject user_id from header to body, if failed, deal with it as form.
 // It should be called before your business logic.
 func ReqData2Form() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		userId := c.Request.Header.Get("user_id")
 		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
@@ -25,11 +26,19 @@ func ReqData2Form() gin.HandlerFunc {
 			}
 			v, err := loadJson(bytes.NewReader(data))
 			if err != nil {
-				// if not request data is NOT json format, restore body
+				// if request data is NOT json format, restore body
 				// log.Printf("restore %s to body", string(data))
-				c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
+				values, err := url.ParseQuery(string(data))
+				if err != nil {
+					log.Printf("parse body data to url values error:%v", err)
+					c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
+				} else {
+					values.Set("user_id", userId)
+					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
+				}
 
 			} else {
+				v["user_id"] = userId
 				form := map2Form(v)
 				c.Request.Body = ioutil.NopCloser(strings.NewReader(form.Encode()))
 			}
