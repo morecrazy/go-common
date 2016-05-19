@@ -33,11 +33,12 @@ func ReqData2Form() gin.HandlerFunc {
 					log.Printf("parse body data to url values error:%v", err)
 					c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
 				} else {
+					c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 					values.Set("user_id", userId)
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
 				}
-
 			} else {
+				c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 				v["user_id"] = userId
 				form := map2Form(v)
 				c.Request.Body = ioutil.NopCloser(strings.NewReader(form.Encode()))
