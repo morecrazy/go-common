@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strings"
 	"third/gin"
+	"third/kafka"
 	"time"
 )
 
@@ -102,12 +103,105 @@ func GinSlowLogger(slog SlowLogger, threshold time.Duration) gin.HandlerFunc {
 	}
 }
 
-const CODOON_REQUEST_ID = "codoon_request_id"
+const (
+	CODOON_REQUEST_ID = "codoon_request_id"
+	CODOON_USER_ID    = "user_id"
+	KAFKA_TOPIC       = "codoon-kafka-log"
+)
 
-func GinServiceCoder(code string) gin.HandlerFunc {
+// func GinServiceCoder(code string) gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		if code != "" {
+// 			c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+code)
+// 		}
+// 	}
+// }
+
+type KafkaLogger struct {
+	RequestId   string
+	UserId      string
+	ServiceName string
+	StartTime   time.Time
+	SpendTime   int64
+	Method      string
+	Host        string
+	Api         string
+	StatusCode  int
+}
+
+func (kl *KafkaLogger) Encode() ([]byte, error) {
+	var buf bytes.Buffer
+	_, err := fmt.Fprintf(&buf, "%s|%s|%s|%d|%d|%s|%s|%s|%d",
+		kl.RequestId,
+		kl.UserId,
+		kl.ServiceName,
+		kl.StartTime.UnixNano()/1e6, // timestamp, ms
+		kl.SpendTime,                // ms
+		kl.Method,
+		kl.Host,
+		kl.Api,
+		kl.StatusCode,
+	)
+	if err != nil {
+		return nil, err
+	} else {
+		return buf.Bytes(), nil
+	}
+}
+
+func (kl *KafkaLogger) Length() int {
+	b, _ := kl.Encode()
+	return len(b)
+}
+
+// GinKafkaLogger
+func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFunc {
+	// init producer
+	config := kafka.NewConfig()
+	config.Producer.RequiredAcks = kafka.WaitForLocal
+	config.Producer.Flush.Frequency = 1 * time.Second
+
+	producer, err := kafka.NewAsyncProducer(brockerList, config)
+	if err != nil {
+		log.Fatalf("create producer error:%v", err)
+	}
+	inputChannel := producer.Input()
+
 	return func(c *gin.Context) {
-		if code != "" {
-			c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+code)
+		start := time.Now()
+
+		// colored with current service code
+		if srvCode != "" {
+			c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+srvCode)
 		}
+
+		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		userId := c.Request.Header.Get(CODOON_USER_ID)
+		method := c.Request.Method
+		host := c.Request.Host
+		api := c.Request.RequestURI
+
+		c.Next()
+
+		m := &KafkaLogger{
+			RequestId:   reqId,
+			UserId:      userId,
+			ServiceName: srvName,
+			StartTime:   start,
+			SpendTime:   time.Now().Sub(start).Nanoseconds() / 1e6,
+			Method:      method,
+			Host:        host,
+			Api:         api,
+			StatusCode:  c.Writer.Status(),
+		}
+
+		inputChannel <- &kafka.ProducerMessage{
+			Topic:     KAFKA_TOPIC,
+			Partition: 0, // TODO
+			Key:       kafka.StringEncoder(srvName),
+			Value:     m,
+		}
+
+		log.Printf("kafka msg send:%+v", m)
 	}
 }

@@ -15,6 +15,7 @@ const (
 
 func ginServer() {
 	engine := gin.New()
+	engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
 	go engine.Run(GIN_SERVER_ADDR)
