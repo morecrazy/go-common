@@ -160,12 +160,17 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 	config := kafka.NewConfig()
 	config.Producer.RequiredAcks = kafka.WaitForLocal
 	config.Producer.Flush.Frequency = 1 * time.Second
-
 	producer, err := kafka.NewAsyncProducer(brockerList, config)
 	if err != nil {
 		log.Fatalf("create producer error:%v", err)
 	}
 	inputChannel := producer.Input()
+	// monitor kafka error
+	go func() {
+		for err := range producer.Errors() {
+			log.Println("Failed to write kafka log entry:", err)
+		}
+	}()
 
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -202,6 +207,6 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 			Value:     m,
 		}
 
-		log.Printf("kafka msg send:%+v", m)
+		// log.Printf("kafka msg send:%+v", m)
 	}
 }

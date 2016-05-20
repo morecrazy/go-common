@@ -48,4 +48,6 @@ func TestReqData2Form(t *testing.T) {
 	if string(data) != "foo" {
 		t.Fatal("rsp:", string(data), err)
 	}
+
+	time.Sleep(2 * time.Second)
 }
