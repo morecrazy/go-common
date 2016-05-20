@@ -15,6 +15,7 @@ const (
 
 func ginServer() {
 	engine := gin.New()
+	engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
 	go engine.Run(GIN_SERVER_ADDR)
@@ -47,4 +48,6 @@ func TestReqData2Form(t *testing.T) {
 	if string(data) != "foo" {
 		t.Fatal("rsp:", string(data), err)
 	}
+
+	time.Sleep(2 * time.Second)
 }
