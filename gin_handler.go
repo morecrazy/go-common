@@ -38,7 +38,9 @@ func ReqData2Form() gin.HandlerFunc {
 					c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
 				} else {
 					c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					values.Set("user_id", userId)
+					// if request data is form format, do NOT reset user_id.
+					// because this only happens for inter-service calling.
+					// values.Set("user_id", userId)
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
 				}
 			} else {
