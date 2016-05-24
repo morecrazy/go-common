@@ -3,6 +3,7 @@ package common
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -109,9 +110,11 @@ func GinSlowLogger(slog SlowLogger, threshold time.Duration) gin.HandlerFunc {
 }
 
 const (
-	CODOON_REQUEST_ID = "codoon_request_id"
-	CODOON_USER_ID    = "user_id"
-	KAFKA_TOPIC       = "codoon-kafka-log"
+	CODOON_REQUEST_ID     = "codoon_request_id"
+	CODOON_SERVICE_CODE   = "codoon_service_code"
+	CODOON_USER_ID        = "user_id"
+	KAFKA_TOPIC           = "codoon-kafka-log"
+	KAFKA_PARTITION_COUNT = 2
 )
 
 // func GinServiceCoder(code string) gin.HandlerFunc {
@@ -124,6 +127,7 @@ const (
 
 type KafkaLogger struct {
 	RequestId   string
+	ServiceCode string
 	UserId      string
 	ServiceName string
 	StartTime   time.Time
@@ -136,8 +140,9 @@ type KafkaLogger struct {
 
 func (kl *KafkaLogger) Encode() ([]byte, error) {
 	var buf bytes.Buffer
-	_, err := fmt.Fprintf(&buf, "%s|%s|%s|%d|%d|%s|%s|%s|%d",
+	_, err := fmt.Fprintf(&buf, "%s|%s|%s|%s|%d|%d|%s|%s|%s|%d",
 		kl.RequestId,
+		kl.ServiceCode,
 		kl.UserId,
 		kl.ServiceName,
 		kl.StartTime.UnixNano()/1e6, // timestamp, ms
@@ -177,15 +182,25 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 		}
 	}()
 
+	var partition int32
+	if srvCode == "" {
+		partition = 0
+	} else {
+		srvCodeI64, _ := binary.ReadVarint(bytes.NewReader([]byte(srvCode)))
+		partition = int32(srvCodeI64) % KAFKA_PARTITION_COUNT
+	}
+
 	return func(c *gin.Context) {
 		start := time.Now()
 
 		// colored with current service code
 		if srvCode != "" {
-			c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+srvCode)
+			// c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+srvCode)
+			c.Request.Header.Set(CODOON_SERVICE_CODE, c.Request.Header.Get(CODOON_SERVICE_CODE)+srvCode)
 		}
 
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		srvCodeChain := c.Request.Header.Get(CODOON_SERVICE_CODE)
 		userId := c.Request.Header.Get(CODOON_USER_ID)
 		method := c.Request.Method
 		host := c.Request.Host
@@ -195,6 +210,7 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 
 		m := &KafkaLogger{
 			RequestId:   reqId,
+			ServiceCode: srvCodeChain,
 			UserId:      userId,
 			ServiceName: srvName,
 			StartTime:   start,
@@ -207,7 +223,7 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 
 		inputChannel <- &kafka.ProducerMessage{
 			Topic:     KAFKA_TOPIC,
-			Partition: 0, // TODO
+			Partition: partition,
 			Key:       kafka.StringEncoder(srvName),
 			Value:     m,
 		}
