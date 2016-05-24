@@ -3,7 +3,6 @@ package common
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -558,77 +557,4 @@ func HttpRequest(method, addr string, params map[string]string) ([]byte, error) 
 		return nil, err
 	}
 	return data, nil
-}
-
-func GinRecovery() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			err := recover()
-			if err != nil {
-				switch err.(type) {
-				case error:
-					CheckError(err.(error))
-				default:
-					err := errors.New(fmt.Sprint(err))
-					CheckError(err)
-				}
-
-				stack := stack(3)
-				Logger.Error("PANIC: %s\n%s", err, stack)
-
-				c.Writer.WriteHeader(http.StatusInternalServerError)
-			}
-
-		}()
-
-		c.Next()
-	}
-}
-
-func MyRecovery() {
-
-	err := recover()
-	if err != nil {
-		switch err.(type) {
-		case error:
-			CheckError(err.(error))
-		default:
-			err := errors.New(fmt.Sprint(err))
-			CheckError(err)
-		}
-
-		stack := stack(3)
-		Logger.Error("PANIC: %s\n%s", err, stack)
-	}
-
-}
-
-func GinLogger() gin.HandlerFunc {
-
-	return func(c *gin.Context) {
-		// Start timer
-		start := time.Now()
-
-		// Process request
-		c.Next()
-
-		// Stop timer
-		end := time.Now()
-		latency := end.Sub(start)
-
-		clientIP := c.ClientIP()
-		method := c.Request.Method
-		statusCode := c.Writer.Status()
-
-		Logger.Notice("[GIN] %v | %3d | %12v | %s | %-7s %s %s\n%s",
-			end.Format("2006/01/02 - 15:04:05"),
-			statusCode,
-			latency,
-			clientIP,
-			method,
-			c.Request.URL.String(),
-			c.Request.URL.Opaque,
-			c.Errors.String())
-
-	}
 }
