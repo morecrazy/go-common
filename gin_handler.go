@@ -195,7 +195,6 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 
 		// colored with current service code
 		if srvCode != "" {
-			// c.Request.Header.Set(CODOON_REQUEST_ID, c.Request.Header.Get(CODOON_REQUEST_ID)+srvCode)
 			c.Request.Header.Set(CODOON_SERVICE_CODE, c.Request.Header.Get(CODOON_SERVICE_CODE)+srvCode)
 		}
 
