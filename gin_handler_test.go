@@ -17,8 +17,14 @@ const (
 	GIN_SERVER_ADDR = "127.0.0.1:18082"
 )
 
+func ginTestHandler(c *gin.Context) {
+	c.Request.Header.Set("Content-Type", "application/x-www-form-urlencode")
+	c.Request.Header.Set("Content-Length", "0")
+}
+
 func ginServer() {
 	engine := gin.New()
+	engine.Use(ginTestHandler)
 	engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
@@ -32,8 +38,10 @@ type HiReq struct {
 }
 
 func hiHandler(c *gin.Context) {
+	log.Printf("request header:%+v", c.Request.Header)
 	req := &HiReq{}
 	if !c.Bind(req) {
+		c.JSON(http.StatusOK, gin.H{"ret": "bind failed"})
 		return
 	}
 	log.Printf("req:%#v", req)
@@ -50,13 +58,8 @@ func TestReqData2Form(t *testing.T) {
 		"foo": "foo",
 	}
 	b, _ := json.Marshal(&params)
-	// data, err := HttpRequest("POST", addr, params)
-	// if string(data) != "foo" {
-	// 	t.Fatal("rsp:", string(data), err)
-	// }
 
 	request, _ := http.NewRequest("POST", addr, bytes.NewReader(b))
-	request.Header.Set("Content-Type", "application/x-www-form-urlencode")
 	request.Header.Set("user_id", "abc")
 	rsp, err := http.DefaultClient.Do(request)
 	if err != nil {
@@ -69,5 +72,4 @@ func TestReqData2Form(t *testing.T) {
 	}
 	log.Printf("ret:%s", string(b))
 
-	// time.Sleep(2 * time.Second)
 }

@@ -22,7 +22,7 @@ import (
 // It should be called before your business logic.
 func ReqData2Form() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userId := c.Request.Header.Get("user_id")
+		userId := c.Request.Header.Get(CODOON_USER_ID)
 		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
@@ -39,18 +39,18 @@ func ReqData2Form() gin.HandlerFunc {
 					c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
 				} else {
 					c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					// if request data is form format, do NOT reset user_id.
-					// because this only happens for inter-service calling.
-					// values.Set("user_id", userId)
+					// if request data is form format, set user_id only when user_id of values is empty.
+					if values.Get(CODOON_USER_ID) == "" {
+						values.Set(CODOON_USER_ID, userId)
+					}
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
 				}
 			} else {
 				// inject use_id into form
-				v["user_id"] = userId
+				v[CODOON_USER_ID] = userId
 				form := map2Form(v)
 				s := form.Encode()
 				c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-				c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(s))) // reset length
 				c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
 			}
 		}
