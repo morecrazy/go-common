@@ -45,10 +45,13 @@ func ReqData2Form() gin.HandlerFunc {
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
 				}
 			} else {
-				c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				// inject use_id into form
 				v["user_id"] = userId
 				form := map2Form(v)
-				c.Request.Body = ioutil.NopCloser(strings.NewReader(form.Encode()))
+				s := form.Encode()
+				c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				c.Request.Header.Set("Content-Length", fmt.Sprintf("%d", len(s))) // reset length
+				c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
 			}
 		}
 	}
