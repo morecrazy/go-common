@@ -37,7 +37,7 @@ func TestLoadCfg(t *testing.T) {
 	start := time.Now()
 	cfg := &FinanceServerConfigure{}
 	addrs := []string{"http://120.26.17.34:4001"}
-	err := LoadCfgFromEtcd(addrs, "financeserver", "dev", cfg)
+	err := LoadCfgFromEtcd(addrs, "financeserver", cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
