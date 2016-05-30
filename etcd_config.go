@@ -55,6 +55,43 @@ func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 	return json.Unmarshal([]byte(data), cfg)
 }
 
+func GetSubCfgDataFromEtcd(addrs []string, service string, subName string) ([]string, error) {
+	api, err := NewEtcdApi(addrs)
+	if err != nil {
+		return nil, err
+	}
+
+	key := etcdKey(service, subName)
+	rsp, err := api.Get(context.Background(), key, nil)
+	if err != nil {
+		log.Printf("read config [%s:%s] from etcd error:%v", service, subName, err)
+		return nil, err
+	}
+
+	if rsp.Node == nil {
+		log.Printf("empty etcd node")
+		return nil, errors.New("empty etcd node")
+	}
+
+	if !rsp.Node.Dir {
+		log.Printf("[key:%s] is not directory", key)
+		return nil, errors.New(key + " is not directory")
+	}
+
+	cfgData := []string{}
+	for _, node := range rsp.Node.Nodes {
+		rsp, err := api.Get(context.Background(), node.Key, nil)
+		if err != nil {
+			return nil, err
+		}
+		if rsp.Node != nil {
+			cfgData = append(cfgData, rsp.Node.Value)
+		}
+	}
+
+	return cfgData, nil
+}
+
 func etcdKey(service, env string) string {
 	return fmt.Sprintf("/config/%s/%s", service, env)
 }
