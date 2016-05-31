@@ -113,6 +113,17 @@ func (cache *Cache) Incr(key string) (int, error) {
 	return res, err
 }
 
+func (cache *Cache) IncrInt64(key string) (int64, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := redis.Int64(conn.Do("INCR", key))
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) Incrby(key string, value int) (int, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()

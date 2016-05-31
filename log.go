@@ -18,7 +18,6 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 
 	format_str := "%{level}: [%{time:2006-01-02 15:04:05.000}][%{pid}][%{module}][goroutine:%{goroutinecount}][%{shortfile}][%{message}]"
 
-
 	Logger = logging.MustGetLogger(process_name)
 
 	sql_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.mysql", false, 1024*1024*1024)
@@ -85,5 +84,35 @@ func ChangeLogLevel(LogLevel string) {
 		backend_info_leveld.SetLevel(logging.DEBUG, "")
 	default:
 		backend_info_leveld.SetLevel(logging.ERROR, "")
+	}
+}
+
+func Debugf(format string, v ...interface{}) {
+	if nil != Logger {
+		Logger.Debug(fmt.Sprintf(format, v...))
+	}
+}
+
+func Infof(format string, v ...interface{}) {
+	if nil != Logger {
+		Logger.Info(fmt.Sprintf(format, v...))
+	}
+}
+
+func Noticef(format string, v ...interface{}) {
+	if nil != Logger {
+		Logger.Notice(fmt.Sprintf(format, v...))
+	}
+}
+
+func Warnf(format string, v ...interface{}) {
+	if nil != Logger {
+		Logger.Warning(fmt.Sprintf(format, v...))
+	}
+}
+
+func Errorf(format string, v ...interface{}) {
+	if nil != Logger {
+		Logger.Error(fmt.Sprintf(format, v...))
 	}
 }
