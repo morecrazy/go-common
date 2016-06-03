@@ -6,9 +6,11 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"log"
+	"net/url"
 )
 
-// I know it is stupid writing a const key in code.
+// I know it is stupid hard-coding a const key in code.
 // We want to introcude hmac into codoon asap and just fire it up.
 const _hmac_key = "bes3a3ZnfHzttfkWAUGfxzXPutuRQgUE"
 
@@ -37,4 +39,18 @@ func GenInternalAPIToken() string {
 
 func VerifyInternalAPIToken(token string) bool {
 	return token == _hmac_internale_api_token
+}
+
+func SignUrlValue(vm map[string]string) string {
+	values := url.Values{}
+	for k, v := range vm {
+		values.Set(k, v)
+	}
+	s := values.Encode()
+	log.Printf("url encoded:%s", s)
+	return GenMAC(s)
+}
+
+func VerifyUrlValueSignature(signature string, vm map[string]string) bool {
+	return signature == SignUrlValue(vm)
 }

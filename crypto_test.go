@@ -25,3 +25,16 @@ func TestInternalAPIToken(t *testing.T) {
 
 	log.Printf("token:%s", token)
 }
+
+func TestSignUrlValue(t *testing.T) {
+	vm := map[string]string{
+		"user_id": "abcd",
+		"content": "测试中文",
+		"a":       "b",
+	}
+	signature := SignUrlValue(vm)
+	log.Printf("signature:%s", signature)
+	if !VerifyUrlValueSignature(signature, vm) {
+		log.Fatal("verify url value signature failed")
+	}
+}
