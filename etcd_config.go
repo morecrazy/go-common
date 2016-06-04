@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"third/context"
 	etcd "third/etcd-client"
-	//"time"
 )
 
 var RawData []byte
@@ -55,6 +55,28 @@ func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 	return json.Unmarshal([]byte(data), cfg)
 }
 
+// 从etcd加载配置,并不做任何格式序列化,直接返回纯文本
+// author: qujianping
+// date: 2016-06-04
+// example: LoadCfgContent([]string{"http://etcd.in.codoon.com"}, "webmiddleware","/online/main.conf")
+func LoadContentFromEtcd(addrs []string, service, path string) (string, error) {
+	api, err := NewEtcdApi(addrs)
+	if err != nil {
+		return "", err
+	}
+	rsp, err := api.Get(context.Background(), etcdPathKey(service, path), nil)
+	if err != nil {
+		log.Printf("read config [%s%s] from etcd error:%v", service, path, err)
+		return "", err
+	}
+	if rsp.Node == nil {
+		log.Printf("empty etcd node")
+		return "", errors.New("empty etcd node")
+	}
+
+	return rsp.Node.Value, nil
+}
+
 func GetSubCfgDataFromEtcd(addrs []string, service string, subName string) ([]string, error) {
 	api, err := NewEtcdApi(addrs)
 	if err != nil {
@@ -94,4 +116,9 @@ func GetSubCfgDataFromEtcd(addrs []string, service string, subName string) ([]st
 
 func etcdKey(service, env string) string {
 	return fmt.Sprintf("/config/%s/%s", service, env)
+}
+
+func etcdPathKey(service string, path string) string {
+	path = strings.TrimSuffix(strings.TrimPrefix(path, "/"), "/")
+	return fmt.Sprintf("/config/%s/%s", service, path)
 }
