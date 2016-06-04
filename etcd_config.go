@@ -58,7 +58,7 @@ func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 // 从etcd加载配置,并不做任何格式序列化,直接返回纯文本
 // author: qujianping
 // date: 2016-06-04
-// example: LoadCfgContent([]string{"http://etcd.in.codoon.com"}, "webmiddleware","/online/main.conf")
+// example: LoadContentFromEtcd([]string{"http://etcd.in.codoon.com"}, "webmiddleware","/online/main.conf")
 func LoadContentFromEtcd(addrs []string, service, path string) (string, error) {
 	api, err := NewEtcdApi(addrs)
 	if err != nil {
