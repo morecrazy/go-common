@@ -46,3 +46,12 @@ func TestLoadCfg(t *testing.T) {
 	}(start)
 	fmt.Printf("%+v\n", cfg)
 }
+
+func TestLoadCfgContent(t *testing.T) {
+	addrs := []string{"http://120.26.17.34:2379"}
+	str, err := LoadContentFromEtcd(addrs, "qwebmiddleware", "/conf.d/ak")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("%s\n", str)
+}

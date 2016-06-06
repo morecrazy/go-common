@@ -1,6 +1,10 @@
 package common
 
-import . "backend/common/protocol"
+import (
+	"third/gorm"
+
+	. "backend/common/protocol"
+)
 
 var UserProfileClient *RpcClient
 var UserLoginClient *RpcClient
@@ -50,6 +54,9 @@ func InitProfileClient(addr string, net string) error {
 }
 
 func GetProfileById(userId string) (UserProfile, error) {
+	if userId == "" {
+		return UserProfile{}, gorm.RecordNotFound
+	}
 	var reply UserprofileDefaultReply
 	args := UserprofileDefaultArgs{
 		Id: userId,
@@ -82,6 +89,9 @@ func BatchGetProfileByIds(userIds []string) (UserprofileList, error) {
 }
 
 func GetLoginById(userId string) (UserLogin, error) {
+	if userId == "" {
+		return UserLogin{}, gorm.RecordNotFound
+	}
 	var reply UserloginDefaultReply
 	args := UserloginDefaultArgs{
 		Id: userId,
