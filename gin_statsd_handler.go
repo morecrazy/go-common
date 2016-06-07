@@ -84,9 +84,9 @@ func consumeStats() {
 				}
 				lastRptTime = time.Now()
 				_statsAggrMap = make(map[string]*StatsRpt)
-				log.Printf("flush all statsd")
+				// log.Printf("flush all statsd")
 			}
-			log.Printf("statsAggrMap:%+v", _statsAggrMap)
+			// log.Printf("statsAggrMap:%+v", _statsAggrMap)
 		}
 	}
 }
@@ -105,7 +105,7 @@ func GinStatter(statsdAddr, serviceName string) gin.HandlerFunc {
 		c.Next()
 
 		bucket := bucketName(serviceName, c.Request.Host, c.Request.URL.Path, c.Request.Method, c.Writer.Status())
-		log.Printf("statsd bucket:%s", bucket)
+		// log.Printf("statsd bucket:%s", bucket)
 		duration := time.Now().Sub(start)
 		_statsRptCh <- &StatsRpt{
 			Bucket:   bucket,
