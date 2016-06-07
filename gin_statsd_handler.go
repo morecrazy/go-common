@@ -1,3 +1,4 @@
+// by liudan
 package common
 
 import (
@@ -96,10 +97,6 @@ func GinStatter(statsdAddr, serviceName string) gin.HandlerFunc {
 	serviceName = _reg.ReplaceAllString(serviceName, "_")
 
 	return func(c *gin.Context) {
-		if _statter == nil {
-			return
-		}
-
 		start := time.Now()
 
 		c.Next()
