@@ -62,10 +62,6 @@ func Gauge(bucket string, v ...string) {
 func bucketName(sn, host, path, method string, httpCode int) string {
 	host = _reg.ReplaceAllString(host, "_")
 	path = _reg.ReplaceAllString(path, "_")
-	// host = strings.Replace(host, ".", "_", -1)
-	// host = strings.Replace(host, ":", "_", -1)
-	// path = strings.Replace(path, ".", "_", -1)
-	// path = strings.Replace(path, "/", "_", -1)
 	return fmt.Sprintf("%s.%s.%s_%s_%d", sn, host, path, method, httpCode)
 }
 
@@ -80,21 +76,6 @@ func consumeStats() {
 			} else {
 				rpt.Count += s.Count
 				rpt.Dur += s.Dur
-				// if time.Now().Sub(rpt.CreateAt) > RPT_INTERVAL {
-				// 	Counter(rpt.Bucket, rpt.Count)
-				// 	Timing(rpt.Bucket, rpt.Dur)
-				// 	delete(_statsAggrMap, rpt.Bucket)
-				// }
-
-				// // perform a random follow report to flush cold key of _statsAggrMap output to statsd server
-				// if time.Now().Nanosecond()%100 <= 1 {
-				// 	for k, v := range _statsAggrMap {
-				// 		Counter(v.Bucket, v.Count)
-				// 		Timing(v.Bucket, v.Dur)
-				// 		delete(_statsAggrMap, k)
-				// 		break
-				// 	}
-				// }
 			}
 			if time.Now().Sub(lastRptTime) > RPT_INTERVAL {
 				for _, rpt := range _statsAggrMap {
