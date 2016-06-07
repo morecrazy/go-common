@@ -25,6 +25,7 @@ func ginTestHandler(c *gin.Context) {
 func ginServer() {
 	engine := gin.New()
 	engine.Use(ginTestHandler)
+	engine.Use(GinStatter("120.26.81.104:8125", "common-test"))
 	engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
