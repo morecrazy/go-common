@@ -11,7 +11,6 @@ var UserLoginClient *RpcClient
 var UserRelationClient *RpcClient
 var RouteServerClinet *RpcClient
 var SportsSortClinet *RpcClient
-var CoinServerClient *RpcClient
 
 func InitRpcClient() error {
 	var err error
@@ -39,8 +38,6 @@ func InitRpcClient() error {
 	if err != nil {
 		Logger.Error("init SportsSortClinet err :", err.Error())
 	}
-
-	CoinServerClient, err = NewRpcClient(Config.RpcSetting["CoinServerSetting"].Addr, Config.RpcSetting["CoinServerSetting"].Net, CoinServerFuncMap, "sportssort", Logger)
 
 	return nil
 }
@@ -265,20 +262,6 @@ func GetUserSort(userIds []string, sportType, sortType, relationType, pageNum, p
 	}
 	//	Logger.Debug("GetUserSort arg %v", args)
 	err := SportsSortClinet.Call("get_user_sport", &args, &reply)
-	if err != nil {
-		Logger.Error(err.Error())
-		err = NewInternalError(RPCErrCode, err)
-	}
-
-	return reply, err
-}
-
-func GetCoinAccount(userId string) (GetAccountReply, error) {
-	var reply GetAccountReply
-	args := GetAccountArgs{
-		UserId: userId,
-	}
-	err := CoinServerClient.Call("get_account", &args, &reply)
 	if err != nil {
 		Logger.Error(err.Error())
 		err = NewInternalError(RPCErrCode, err)
