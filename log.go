@@ -18,8 +18,8 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	}
 
 
-	//format_str := "%{level}: [%{time:2006-01-02 15:04:05.000}][%{pid}][%{module}][goroutine:%{goroutinecount}][%{shortfile}][%{message}]"
-	format_str := "%{color} %{time:2006-01-02 15:04:05.000} %{level:.4s} %{id:03x} %{pid} %{module} %{goroutineid} %{goroutinecount} %{shortfile} %{shortfunc} %{color:reset} %{message}"
+	format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
+	//format_str := "%{color} %{time:2006-01-02 15:04:05.000}  %{id:03x} %{pid} %{module} %{goroutineid} %{goroutinecount} %{shortfile} %{shortfunc} %{color:reset} %{message}"
 
 
 	Logger = logging.MustGetLogger(process_name)
