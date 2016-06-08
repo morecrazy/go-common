@@ -17,10 +17,8 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	}
 
 
-	format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
-	//format_str := "%{color} %{time:2006-01-02 15:04:05.000}  %{id:03x} %{pid} %{module} %{goroutineid} %{goroutinecount} %{shortfile} %{shortfunc} %{color:reset} %{message}"
-
-
+	//format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
+	format_str := "%{color}%{level:.4s}:%{time:2006-01-02 15:04:05.000}%{id:03x}[%{goroutineid}/%{goroutinecount}] %{shortfile}%{color:reset} %{message}"
 	Logger = logging.MustGetLogger(process_name)
 
 	sql_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.mysql", false, 1024*1024*1024)
