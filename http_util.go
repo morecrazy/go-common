@@ -394,9 +394,10 @@ func SendRequest(http_method, urls string, req_body interface{}, req_form map[st
 		Logger.Error("send request err :%v", err)
 		return http.StatusNotFound, "", err
 	}
+	// avoid goroutine leak without closing body
+	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusOK {
-		defer response.Body.Close()
 		body, err = ioutil.ReadAll(response.Body)
 		if nil == err {
 			Logger.Debug("body:%v", string(body))
