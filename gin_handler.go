@@ -46,6 +46,10 @@ func ReqData2Form() gin.HandlerFunc {
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
 				}
 			} else {
+				// if user_id in request is not empty, move it to req_user_id
+				if uid, ok := v[CODOON_USER_ID]; ok {
+					v["req_user_id"] = uid
+				}
 				// inject use_id into form
 				v[CODOON_USER_ID] = userId
 				form := map2Form(v)
