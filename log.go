@@ -90,30 +90,30 @@ func ChangeLogLevel(LogLevel string) {
 
 func Debugf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Debug(fmt.Sprintf(format, v...))
+		Logger.Debug(format, v...)
 	}
 }
 
 func Infof(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Info(fmt.Sprintf(format, v...))
+		Logger.Info(format, v...)
 	}
 }
 
 func Noticef(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Notice(fmt.Sprintf(format, v...))
+		Logger.Notice(format, v...)
 	}
 }
 
 func Warnf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Warning(fmt.Sprintf(format, v...))
+		Logger.Warning(format, v...)
 	}
 }
 
 func Errorf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Error(fmt.Sprintf(format, v...))
+		Logger.Error(format, v...)
 	}
 }
