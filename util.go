@@ -2,6 +2,7 @@ package common
 
 import (
 	"bytes"
+	"compress/gzip"
 	"compress/zlib"
 	"encoding/base64"
 	"errors"
@@ -418,6 +419,28 @@ func DoZlibUnCompress(compressSrc []byte) []byte {
 	r, err := zlib.NewReader(b)
 	if nil != err || r == nil {
 		Errorf("DoZlibUnCompress error :%v", err)
+		return compressSrc
+	}
+	io.Copy(&out, r)
+	return out.Bytes()
+}
+
+//进行gzip压缩
+func DoGzipCompress(src []byte) []byte {
+	var in bytes.Buffer
+	w := gzip.NewWriter(&in)
+	w.Write(src)
+	w.Close()
+	return in.Bytes()
+}
+
+//进行gzip解压缩
+func DoGzipUnCompress(compressSrc []byte) []byte {
+	b := bytes.NewReader(compressSrc)
+	var out bytes.Buffer
+	r, err := gzip.NewReader(b)
+	if nil != err || r == nil {
+		Errorf("DoGzipUnCompress error :%v", err)
 		return compressSrc
 	}
 	io.Copy(&out, r)
