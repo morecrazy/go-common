@@ -88,9 +88,9 @@ func ChangeLogLevel(LogLevel string) {
 }
 
 // If use followwing functions, call UseCommonLogger first
-func UseCommonLogger() {
+func SetExtraCalldepth(depth int) {
 	if nil != Logger {
-		Logger.ExtraCalldepth += 1
+		Logger.ExtraCalldepth = depth
 	}
 }
 
