@@ -415,7 +415,11 @@ func DoZlibCompress(src []byte) []byte {
 func DoZlibUnCompress(compressSrc []byte) []byte {
 	b := bytes.NewReader(compressSrc)
 	var out bytes.Buffer
-	r, _ := zlib.NewReader(b)
+	r, err := zlib.NewReader(b)
+	if nil != err || r == nil {
+		Errorf("DoZlibUnCompress error :%v", err)
+		return compressSrc
+	}
 	io.Copy(&out, r)
 	return out.Bytes()
 }
