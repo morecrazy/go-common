@@ -16,10 +16,8 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 		return nil, nil
 	}
 
-
 	//format_str := "%{level}: [%{time:2006-01-02 15:04:05.000}][%{pid}][%{module}][goroutine:%{goroutinecount}][%{shortfile}][%{message}]"
 	format_str := "%{color} %{time:2006-01-02 15:04:05.000} %{level:.4s} %{id:03x} %{pid} %{module} %{goroutineid} %{goroutinecount} %{shortfile} %{shortfunc} %{color:reset} %{message}"
-
 
 	Logger = logging.MustGetLogger(process_name)
 
@@ -87,6 +85,13 @@ func ChangeLogLevel(LogLevel string) {
 		backend_info_leveld.SetLevel(logging.DEBUG, "")
 	default:
 		backend_info_leveld.SetLevel(logging.ERROR, "")
+	}
+}
+
+// If use followwing functions, call UseCommonLogger first
+func UseCommonLogger() {
+	if nil != Logger {
+		Logger.ExtraCalldepth += 1
 	}
 }
 
