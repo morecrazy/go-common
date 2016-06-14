@@ -29,6 +29,8 @@ func SetSessionByToken(token string) string {
 		fmt.Println("token-session connection error.")
 		return ""
 	}
+	// avoid goroutine leak without closing body
+	defer res.Body.Close()
 	cookie := res.Cookies()
 	for _, item := range cookie {
 		if item.Name == "sessionid" {

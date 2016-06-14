@@ -16,9 +16,8 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 		return nil, nil
 	}
 
-	//format_str := "%{level}: [%{time:2006-01-02 15:04:05.000}][%{pid}][%{module}][goroutine:%{goroutinecount}][%{shortfile}][%{message}]"
-	format_str := "%{color} %{time:2006-01-02 15:04:05.000} %{level:.4s} %{id:03x} %{pid} %{module} %{goroutineid} %{goroutinecount} %{shortfile} %{shortfunc} %{color:reset} %{message}"
-
+	//format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
+	format_str := "%{color}%{level:.4s}:%{time:2006-01-02 15:04:05.000}[%{id:03x}][%{goroutineid}/%{goroutinecount}] %{shortfile}%{color:reset} %{message}"
 	Logger = logging.MustGetLogger(process_name)
 
 	sql_log_fp, err := logging.NewFileLogWriter(Config.LogDir+"/"+process_name+".log.mysql", false, 1024*1024*1024)
@@ -97,30 +96,30 @@ func UseCommonLogger() {
 
 func Debugf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Debug(fmt.Sprintf(format, v...))
+		Logger.Debug(format, v...)
 	}
 }
 
 func Infof(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Info(fmt.Sprintf(format, v...))
+		Logger.Info(format, v...)
 	}
 }
 
 func Noticef(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Notice(fmt.Sprintf(format, v...))
+		Logger.Notice(format, v...)
 	}
 }
 
 func Warnf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Warning(fmt.Sprintf(format, v...))
+		Logger.Warning(format, v...)
 	}
 }
 
 func Errorf(format string, v ...interface{}) {
 	if nil != Logger {
-		Logger.Error(fmt.Sprintf(format, v...))
+		Logger.Error(format, v...)
 	}
 }
