@@ -413,16 +413,16 @@ func DoZlibCompress(src []byte) []byte {
 }
 
 //进行zlib解压缩
-func DoZlibUnCompress(compressSrc []byte) []byte {
+func DoZlibUnCompress(compressSrc []byte) ([]byte, error) {
 	b := bytes.NewReader(compressSrc)
 	var out bytes.Buffer
 	r, err := zlib.NewReader(b)
 	if nil != err || r == nil {
 		Errorf("DoZlibUnCompress error :%v", err)
-		return compressSrc
+		return compressSrc, err
 	}
 	io.Copy(&out, r)
-	return out.Bytes()
+	return out.Bytes(), nil
 }
 
 //进行gzip压缩
@@ -435,14 +435,14 @@ func DoGzipCompress(src []byte) []byte {
 }
 
 //进行gzip解压缩
-func DoGzipUnCompress(compressSrc []byte) []byte {
+func DoGzipUnCompress(compressSrc []byte) ([]byte, error) {
 	b := bytes.NewReader(compressSrc)
 	var out bytes.Buffer
 	r, err := gzip.NewReader(b)
 	if nil != err || r == nil {
 		Errorf("DoGzipUnCompress error :%v", err)
-		return compressSrc
+		return compressSrc, err
 	}
 	io.Copy(&out, r)
-	return out.Bytes()
+	return out.Bytes(), nil
 }
