@@ -297,8 +297,10 @@ func GinLogger() gin.HandlerFunc {
 		clientIP := c.ClientIP()
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
+		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
 
-		Logger.Notice("[GIN] %v | %3d | %12v | %s | %-7s %s %s\n%s",
+		Logger.Notice("[GIN][req_id:%s] %v | %3d | %12v | %s | %-7s %s %s\n%s",
+			reqId,
 			end.Format("2006/01/02 - 15:04:05"),
 			statusCode,
 			latency,
