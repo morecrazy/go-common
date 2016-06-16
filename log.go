@@ -218,3 +218,7 @@ func ColorForMethod(method string) string {
 		return reset
 	}
 }
+
+func ColorForReset() string {
+	return reset
+}
