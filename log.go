@@ -185,7 +185,7 @@ var (
 	reset   = string([]byte{27, 91, 48, 109})
 )
 
-func colorForStatus(code int) string {
+func ColorForStatus(code int) string {
 	switch {
 	case code >= 200 && code <= 299:
 		return green
@@ -198,7 +198,7 @@ func colorForStatus(code int) string {
 	}
 }
 
-func colorForMethod(method string) string {
+func ColorForMethod(method string) string {
 	switch {
 	case method == "GET":
 		return blue
