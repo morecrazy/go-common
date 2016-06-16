@@ -297,18 +297,30 @@ func GinLogger() gin.HandlerFunc {
 		clientIP := c.ClientIP()
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
+		statusColor := colorForStatus(statusCode)
+		methodColor := colorForMethod(method)
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		Logger.Notice("[GIN][req_id:%s] %v | %3d | %12v | %s | %-7s %s %s\n%s",
-			reqId,
-			end.Format("2006/01/02 - 15:04:05"),
-			statusCode,
-			latency,
+		var requestData string
+		if method == "GET" || method == "DELETE" {
+			requestData = c.Request.RequestURI
+		} else {
+			c.Request.ParseForm()
+			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+		}
+
+		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.02fms [%s] [req_id:%s] [user_id:%s] %s",
+			methodColor, method, reset,
+			c.Request.Host,
+			Cuts(requestData, 1024),
+			statusColor, statusCode, reset,
+			latency.Seconds()/1000.0,
 			clientIP,
-			method,
-			c.Request.URL.String(),
-			c.Request.URL.Opaque,
-			c.Errors.String())
+			reqId,
+			userId,
+			c.Errors.String(),
+		)
 
 	}
 }
