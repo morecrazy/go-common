@@ -309,13 +309,14 @@ func GinLogger() gin.HandlerFunc {
 			c.Request.ParseForm()
 			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
 		}
+		requestData = Cuts(requestData, 1024)
 
-		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.02fms [%s] [req_id:%s] [user_id:%s] %s",
+		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s",
 			methodColor, method, reset,
 			c.Request.Host,
-			Cuts(requestData, 1024),
+			requestData,
 			statusColor, statusCode, reset,
-			latency.Seconds()/1000.0,
+			latency.Seconds(),
 			clientIP,
 			reqId,
 			userId,
@@ -325,48 +326,49 @@ func GinLogger() gin.HandlerFunc {
 	}
 }
 
-// type LogExtender func(*gin.Context) string
+type LogExtender func(c *gin.Context) string
 
-// func GinLoggerExt() gin.HandlerFunc {
+func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
 
-// 	return func(c *gin.Context) {
-// 		// Start timer
-// 		start := time.Now()
+	return func(c *gin.Context) {
+		// Start timer
+		start := time.Now()
 
-// 		// Process request
-// 		c.Next()
+		// Process request
+		c.Next()
 
-// 		// Stop timer
-// 		end := time.Now()
-// 		latency := end.Sub(start)
+		// Stop timer
+		end := time.Now()
+		latency := end.Sub(start)
 
-// 		clientIP := c.ClientIP()
-// 		method := c.Request.Method
-// 		statusCode := c.Writer.Status()
-// 		statusColor := colorForStatus(statusCode)
-// 		methodColor := colorForMethod(method)
-// 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
-// 		userId := c.Request.Header.Get(CODOON_USER_ID)
+		clientIP := c.ClientIP()
+		method := c.Request.Method
+		statusCode := c.Writer.Status()
+		statusColor := ColorForStatus(statusCode)
+		methodColor := ColorForMethod(method)
+		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-// 		var requestData string
-// 		if method == "GET" || method == "DELETE" {
-// 			requestData = c.Request.RequestURI
-// 		} else {
-// 			c.Request.ParseForm()
-// 			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
-// 		}
+		var requestData string
+		if method == "GET" || method == "DELETE" {
+			requestData = c.Request.RequestURI
+		} else {
+			c.Request.ParseForm()
+			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+		}
 
-// 		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.02fms [%s] [req_id:%s] [user_id:%s] %s",
-// 			methodColor, method, reset,
-// 			c.Request.Host,
-// 			Cuts(requestData, 1024),
-// 			statusColor, statusCode, reset,
-// 			latency.Seconds()/1000.0,
-// 			clientIP,
-// 			reqId,
-// 			userId,
-// 			c.Errors.String(),
-// 		)
+		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s [ext:%s]",
+			methodColor, method, reset,
+			c.Request.Host,
+			Cuts(requestData, 1024),
+			statusColor, statusCode, reset,
+			latency.Seconds(),
+			clientIP,
+			reqId,
+			userId,
+			c.Errors.String(),
+			extender(c),
+		)
 
-// 	}
-// }
+	}
+}
