@@ -302,19 +302,12 @@ func GinLogger() gin.HandlerFunc {
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
 		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		var requestData string
-		if method == "GET" || method == "DELETE" {
-			requestData = c.Request.RequestURI
-		} else {
-			c.Request.ParseForm()
-			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
-		}
-		requestData = Cuts(requestData, 1024)
+		requestData := GetRequestData(c)
 
 		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s",
 			methodColor, method, reset,
 			c.Request.Host,
-			requestData,
+			Cuts(requestData, 1024),
 			statusColor, statusCode, reset,
 			latency.Seconds(),
 			clientIP,
@@ -349,13 +342,7 @@ func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
 		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		var requestData string
-		if method == "GET" || method == "DELETE" {
-			requestData = c.Request.RequestURI
-		} else {
-			c.Request.ParseForm()
-			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
-		}
+		requestData := GetRequestData(c)
 
 		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s [ext:%s]",
 			methodColor, method, reset,
@@ -371,4 +358,16 @@ func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
 		)
 
 	}
+}
+
+func GetRequestData(c *gin.Context) string {
+	var requestData string
+	method := c.Request.Method
+	if method == "GET" || method == "DELETE" {
+		requestData = c.Request.RequestURI
+	} else {
+		c.Request.ParseForm()
+		requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+	}
+	return requestData
 }
