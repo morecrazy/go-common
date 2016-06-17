@@ -297,16 +297,78 @@ func GinLogger() gin.HandlerFunc {
 		clientIP := c.ClientIP()
 		method := c.Request.Method
 		statusCode := c.Writer.Status()
+		statusColor := ColorForStatus(statusCode)
+		methodColor := ColorForMethod(method)
+		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		Logger.Notice("[GIN] %v | %3d | %12v | %s | %-7s %s %s\n%s",
-			end.Format("2006/01/02 - 15:04:05"),
-			statusCode,
-			latency,
+		var requestData string
+		if method == "GET" || method == "DELETE" {
+			requestData = c.Request.RequestURI
+		} else {
+			c.Request.ParseForm()
+			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+		}
+		requestData = Cuts(requestData, 1024)
+
+		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s",
+			methodColor, method, reset,
+			c.Request.Host,
+			requestData,
+			statusColor, statusCode, reset,
+			latency.Seconds(),
 			clientIP,
-			method,
-			c.Request.URL.String(),
-			c.Request.URL.Opaque,
-			c.Errors.String())
+			reqId,
+			userId,
+			c.Errors.String(),
+		)
+
+	}
+}
+
+type LogExtender func(c *gin.Context) string
+
+func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		// Start timer
+		start := time.Now()
+
+		// Process request
+		c.Next()
+
+		// Stop timer
+		end := time.Now()
+		latency := end.Sub(start)
+
+		clientIP := c.ClientIP()
+		method := c.Request.Method
+		statusCode := c.Writer.Status()
+		statusColor := ColorForStatus(statusCode)
+		methodColor := ColorForMethod(method)
+		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
+		userId := c.Request.Header.Get(CODOON_USER_ID)
+
+		var requestData string
+		if method == "GET" || method == "DELETE" {
+			requestData = c.Request.RequestURI
+		} else {
+			c.Request.ParseForm()
+			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+		}
+
+		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s [ext:%s]",
+			methodColor, method, reset,
+			c.Request.Host,
+			Cuts(requestData, 1024),
+			statusColor, statusCode, reset,
+			latency.Seconds(),
+			clientIP,
+			reqId,
+			userId,
+			c.Errors.String(),
+			extender(c),
+		)
 
 	}
 }

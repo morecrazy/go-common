@@ -3,6 +3,7 @@ package common
 
 import (
 	"io"
+	"net/http"
 	"strings"
 	"third/upyun"
 )
@@ -21,20 +22,20 @@ func init() {
 	}
 }
 
-func UploadFile(key string, value io.Reader, headers map[string]string) (string, error) {
-	_, err := _upyun.Put(key, value, true, headers)
+func UploadFile(key string, value io.Reader, headers map[string]string) (string, http.Header, error) {
+	header, err := _upyun.Put(key, value, true, headers)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	} else {
-		return FileUrl(key), nil
+		return FileUrl(key), header, nil
 	}
 
 }
 
-func UploadFileFromUrl(key, addr string, headers map[string]string) (string, error) {
+func UploadFileFromUrl(key, addr string, headers map[string]string) (string, http.Header, error) {
 	_, data, err := SendRequest("GET", addr, nil, nil, nil)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	r := strings.NewReader(data)
 	return UploadFile(key, r, headers)
