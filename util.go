@@ -446,3 +446,16 @@ func DoGzipUnCompress(compressSrc []byte) ([]byte, error) {
 	io.Copy(&out, r)
 	return out.Bytes(), nil
 }
+
+const USER_ID_LEN = 36
+
+func ValidateUserId(user_id string) bool {
+	if USER_ID_LEN != len(user_id) {
+		return false
+	}
+	s := strings.Split(user_id, "-")
+	if len(s) != 5 {
+		return false
+	}
+	return true
+}
