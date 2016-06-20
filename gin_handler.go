@@ -29,7 +29,13 @@ func ReqData2Form() gin.HandlerFunc {
 				log.Printf("read request body error:%v", err)
 				return
 			}
-			v, err := loadJson(bytes.NewReader(data))
+			var v map[string]interface{}
+			if len(data) == 0 {
+				v = make(map[string]interface{})
+				err = nil
+			} else {
+				v, err = loadJson(bytes.NewReader(data))
+			}
 			if err != nil {
 				// if request data is NOT json format, restore body
 				// log.Printf("restore %s to body", string(data))
