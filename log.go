@@ -17,7 +17,6 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 		return nil, nil
 	}
 
-
 	//format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
 	format_str := "%{color}%{level:.4s}:%{time:2006-01-02 15:04:05.000}[%{id:03x}][%{goroutineid}/%{goroutinecount}] %{shortfile}%{color:reset} %{message}"
 	Logger = logging.MustGetLogger(process_name)
@@ -73,10 +72,10 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 		log.Fatalf("init sentry client err")
 		return nil, err
 	}
-	sentry_err := logging.NewSentryBackend(sentry_client, logging.WARNING)
+	sentry_err := logging.NewSentryBackend(sentry_client, logging.ERROR)
 	sentry_formatter := logging.NewBackendFormatter(sentry_err, format)
 	sentry_err_leveld := logging.AddModuleLevel(sentry_formatter)
-	sentry_err_leveld.SetLevel(logging.WARNING, "")
+	sentry_err_leveld.SetLevel(logging.ERROR, "")
 
 	logging.SetBackend(backend_info_leveld, backend_err_leveld, sentry_err_leveld)
 
