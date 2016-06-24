@@ -442,6 +442,19 @@ func (cache *Cache) ZaddBatch(key string, score_member_list []interface{}) (inte
 	return res, err
 }
 
+// ZREM命令从有序集合存储键删除指定成员
+// update by wuql 2016-6-24
+func (cache *Cache) Zrem(key, member string) (interface{}, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+
+	res, err := conn.Do("ZREM", key, member)
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) Zadd(key string, value, member interface{}) (interface{}, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
