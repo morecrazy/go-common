@@ -430,12 +430,12 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 // 批量插入 for SortedSet（有序集合）
 // score_member_list: score1, member2, score2, member2...
 // update by wuql 2016-6-24
-func (cache *Cache) BatchZadd(key string, score_member_list ...interface{}) (interface{}, error) {
+func (cache *Cache) ZaddBatch(key string, score_member_list []interface{}) (interface{}, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
 	// 必须是:score(value) member(key)  数据对
-	// len(score_member_list) >= 2 && len(sms)%2 == 0
-	res, err := conn.Do("ZADD", score_member_list)
+	// len(score_member_list) >= 2 && len(score_member_list)%2 == 0
+	res, err := conn.Do("ZADD", score_member_list...)
 	if nil != err && !strings.Contains(err.Error(), "nil returned") {
 		err = NewInternalError(CacheErrCode, err)
 	}
