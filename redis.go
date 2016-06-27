@@ -455,6 +455,32 @@ func (cache *Cache) Zrem(key, member string) (interface{}, error) {
 	return res, err
 }
 
+// Set the value of key ``name`` to ``value`` if key doesn't exist"
+// "Set the value of key ``key`` to ``value`` if key exist"
+// update by wuql 2016-6-27
+func (cache *Cache) ENSet(key string, value interface{}) (interface{}, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	is_exist, err := cache.Exists(key)
+	if err == nil {
+		if is_exist == true {
+			res, err := conn.Do("SETEX", key, value)
+			if nil != err && !strings.Contains(err.Error(), "nil returned") {
+				err = NewInternalError(CacheErrCode, err)
+			}
+			return res, err
+		} else {
+			res, err := conn.Do("SETNX", key, value)
+			if nil != err && !strings.Contains(err.Error(), "nil returned") {
+				err = NewInternalError(CacheErrCode, err)
+			}
+			return res, err
+		}
+	} else {
+		return nil, err
+	}
+}
+
 func (cache *Cache) Zadd(key string, value, member interface{}) (interface{}, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
