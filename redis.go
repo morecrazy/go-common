@@ -427,6 +427,21 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 	return res, err
 }
 
+// 判断某个对象是否存在 存在返回true 不存在返回false
+// for SimpleSortedSet
+// update by wuql 2016-6-28
+func (cache *Cache) IsMember(key, member string) bool {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := conn.Do("ZSCORE", key, member)
+	// res为score(value)
+	if res != nil && err == nil {
+		return true
+	} else {
+		return false
+	}
+}
+
 // 批量插入 for SortedSet（有序集合）
 // score_member_list: score1, member2, score2, member2...
 // update by wuql 2016-6-24
