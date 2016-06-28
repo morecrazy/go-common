@@ -25,7 +25,7 @@ func (this *UpyunParams) InitUpyun() {
 	return
 }
 
-func (this *UpyunParams) UploadFile(key string, value io.Reader, headers map[string]string) (string, http.Header, error) {
+func (this *UpyunParams) UploadFile(domain_prefix, key string, value io.Reader, headers map[string]string) (string, http.Header, error) {
 	if _upyun == nil {
 		return "", nil, errors.New("_upyun not init")
 	}
@@ -34,12 +34,12 @@ func (this *UpyunParams) UploadFile(key string, value io.Reader, headers map[str
 	if err != nil {
 		return "", nil, err
 	} else {
-		return FileUrl(key), header, nil
+		return this.FileUrl(domain_prefix, key), header, nil
 	}
 
 }
 
-func (this *UpyunParams) UploadFileFromUrl(key, addr string, headers map[string]string) (string, http.Header, error) {
+func (this *UpyunParams) UploadFileFromUrl(domain_prefix, key, addr string, headers map[string]string) (string, http.Header, error) {
 	if _upyun == nil {
 		return "", nil, errors.New("_upyun not init")
 	}
@@ -49,10 +49,10 @@ func (this *UpyunParams) UploadFileFromUrl(key, addr string, headers map[string]
 		return "", nil, err
 	}
 	r := strings.NewReader(data)
-	return UploadFile(key, r, headers)
+	return this.UploadFile(domain_prefix, key, r, headers)
 }
 
-func (this *UpyunParams) FileUrl(domain_head, key string) string {
+func (this *UpyunParams) FileUrl(domain_prefix, key string) string {
 	//like http://img3.codoon.com/aaaaaaaaa
-	return "http://" + domain_head + ".codoon.com/" + key
+	return "http://" + domain_prefix + ".codoon.com/" + key
 }
