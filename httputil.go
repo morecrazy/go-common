@@ -2,6 +2,8 @@
 package common
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -77,8 +79,22 @@ func HttpRequestWithCode(ctx context.Context, method, addr string, params map[st
 	defer response.Body.Close()
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		// send sentry
+		CheckError(errors.New(fmt.Sprintf("%s %s %s", method, addr, err.Error())))
+		// send stats
+		if _statter != nil {
+			bucket := fmt.Sprintf("%s_error", strings.Replace(request.URL.Path, "/", "_", -1))
+			_statter.Counter(1.0, bucket, 1)
+		}
 		log.Printf("httpRequest: read response error:%v", err)
 		return nil, 0, err
+	}
+	if response.StatusCode != http.StatusOK {
+		CheckError(errors.New(fmt.Sprintf("%s %s %d", method, addr, response.StatusCode)))
+		if _statter != nil {
+			bucket := fmt.Sprintf("%s_%d", strings.Replace(request.URL.Path, "/", "_", -1), response.StatusCode)
+			_statter.Counter(1.0, bucket, 1)
+		}
 	}
 	return data, response.StatusCode, nil
 }
