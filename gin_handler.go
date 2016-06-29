@@ -82,7 +82,6 @@ func loadJson(r io.Reader) (map[string]interface{}, error) {
 func map2Form(v map[string]interface{}) url.Values {
 	form := url.Values{}
 	var vStr string
-	// var ok bool
 	for key, value := range v {
 		switch value.(type) {
 		case string:
@@ -96,10 +95,6 @@ func map2Form(v map[string]interface{}) url.Values {
 				vStr = string(b)
 			}
 		}
-		////
-		// if vStr, ok = value.(string); !ok {
-		// 	vStr = fmt.Sprintf("%v", value)
-		// }
 		form.Set(key, vStr)
 	}
 	return form
