@@ -47,6 +47,7 @@ func hiHandler(c *gin.Context) {
 		return
 	}
 	log.Printf("req:%#v", req)
+	log.Printf("req_user_id:%s", c.DefaultPostForm("req_user_id", "defaultValue"))
 	c.Writer.Write([]byte(req.UserId + req.Foo))
 }
 
@@ -90,6 +91,26 @@ func TestReqData2Form(t *testing.T) {
 	defer rsp.Body.Close()
 	b, _ = ioutil.ReadAll(rsp.Body)
 	if string(b) != "abc" {
+		t.Fatal("rsp:", string(b), err)
+	}
+	log.Printf("ret:%s", string(b))
+
+	// test case 3: json request with user_id as key
+	addr = fmt.Sprintf("http://%s/hi", GIN_SERVER_ADDR)
+	params = map[string]string{
+		"user_id": "test_user_id",
+		"foo":     "foo",
+	}
+	b, _ = json.Marshal(&params)
+	request, _ = http.NewRequest("POST", addr, bytes.NewReader(b))
+	request.Header.Set("user_id", "abc")
+	rsp, err = http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rsp.Body.Close()
+	b, _ = ioutil.ReadAll(rsp.Body)
+	if string(b) != "abcfoo" {
 		t.Fatal("rsp:", string(b), err)
 	}
 	log.Printf("ret:%s", string(b))
