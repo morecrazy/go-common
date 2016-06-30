@@ -1,46 +1,58 @@
-// by liudan
+// by liudan,modify by daiping @ 2016-06-28
 package common
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strings"
 	"third/upyun"
 )
 
-const (
-	UP_BUCKET   = "codoon-img3"
-	UP_USERNAME = "codoon"
-	UP_PASSWORD = "codoon5401036"
-)
+type UpyunParams struct {
+	UpBucket   string
+	UpUsername string
+	UpPassword string
+}
 
 var _upyun *upyun.UpYun
 
-func init() {
+func (this *UpyunParams) InitUpyun() {
 	if _upyun == nil {
-		_upyun = upyun.NewUpYun(UP_BUCKET, UP_USERNAME, UP_PASSWORD)
+		_upyun = upyun.NewUpYun(this.UpBucket, this.UpUsername, this.UpPassword)
 	}
+
+	return
 }
 
-func UploadFile(key string, value io.Reader, headers map[string]string) (string, http.Header, error) {
+func (this *UpyunParams) UploadFile(domain_prefix, key string, value io.Reader, headers map[string]string) (string, http.Header, error) {
+	if _upyun == nil {
+		return "", nil, errors.New("_upyun not init")
+	}
+
 	header, err := _upyun.Put(key, value, true, headers)
 	if err != nil {
 		return "", nil, err
 	} else {
-		return FileUrl(key), header, nil
+		return this.FileUrl(domain_prefix, key), header, nil
 	}
 
 }
 
-func UploadFileFromUrl(key, addr string, headers map[string]string) (string, http.Header, error) {
+func (this *UpyunParams) UploadFileFromUrl(domain_prefix, key, addr string, headers map[string]string) (string, http.Header, error) {
+	if _upyun == nil {
+		return "", nil, errors.New("_upyun not init")
+	}
+
 	_, data, err := SendRequest("GET", addr, nil, nil, nil)
 	if err != nil {
 		return "", nil, err
 	}
 	r := strings.NewReader(data)
-	return UploadFile(key, r, headers)
+	return this.UploadFile(domain_prefix, key, r, headers)
 }
 
-func FileUrl(key string) string {
-	return "http://img3.codoon.com" + key
+func (this *UpyunParams) FileUrl(domain_prefix, key string) string {
+	//like http://img3.codoon.com/aaaaaaaaa
+	return "http://" + domain_prefix + ".codoon.com/" + key
 }

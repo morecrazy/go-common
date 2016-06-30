@@ -29,7 +29,13 @@ func ReqData2Form() gin.HandlerFunc {
 				log.Printf("read request body error:%v", err)
 				return
 			}
-			v, err := loadJson(bytes.NewReader(data))
+			var v map[string]interface{}
+			if len(data) == 0 {
+				v = make(map[string]interface{})
+				err = nil
+			} else {
+				v, err = loadJson(bytes.NewReader(data))
+			}
 			if err != nil {
 				// if request data is NOT json format, restore body
 				// log.Printf("restore %s to body", string(data))
@@ -302,19 +308,12 @@ func GinLogger() gin.HandlerFunc {
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
 		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		var requestData string
-		if method == "GET" || method == "DELETE" {
-			requestData = c.Request.RequestURI
-		} else {
-			c.Request.ParseForm()
-			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
-		}
-		requestData = Cuts(requestData, 1024)
+		requestData := GetRequestData(c)
 
 		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s",
 			methodColor, method, reset,
 			c.Request.Host,
-			requestData,
+			Cuts(requestData, 2048),
 			statusColor, statusCode, reset,
 			latency.Seconds(),
 			clientIP,
@@ -349,18 +348,12 @@ func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
 		reqId := c.Request.Header.Get(CODOON_REQUEST_ID)
 		userId := c.Request.Header.Get(CODOON_USER_ID)
 
-		var requestData string
-		if method == "GET" || method == "DELETE" {
-			requestData = c.Request.RequestURI
-		} else {
-			c.Request.ParseForm()
-			requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
-		}
+		requestData := GetRequestData(c)
 
 		Logger.Notice("[GIN] %s%s%s %s%s %s%d%s %.03f [%s] [req_id:%s] [user_id:%s] %s [ext:%s]",
 			methodColor, method, reset,
 			c.Request.Host,
-			Cuts(requestData, 1024),
+			Cuts(requestData, 2048),
 			statusColor, statusCode, reset,
 			latency.Seconds(),
 			clientIP,
@@ -371,4 +364,16 @@ func GinLoggerExt(extender LogExtender) gin.HandlerFunc {
 		)
 
 	}
+}
+
+func GetRequestData(c *gin.Context) string {
+	var requestData string
+	method := c.Request.Method
+	if method == "GET" || method == "DELETE" {
+		requestData = c.Request.RequestURI
+	} else {
+		c.Request.ParseForm()
+		requestData = fmt.Sprintf("%s [%s]", c.Request.RequestURI, c.Request.Form.Encode())
+	}
+	return requestData
 }

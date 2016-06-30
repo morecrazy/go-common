@@ -29,6 +29,7 @@ func ginServer() {
 	engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
+	engine.POST("/uid", uidHandler)
 	go engine.Run(GIN_SERVER_ADDR)
 	time.Sleep(2 * time.Second)
 }
@@ -49,11 +50,16 @@ func hiHandler(c *gin.Context) {
 	c.Writer.Write([]byte(req.UserId + req.Foo))
 }
 
+func uidHandler(c *gin.Context) {
+	c.Writer.Write([]byte(c.DefaultPostForm("user_id", "")))
+}
+
 func init() {
 	ginServer()
 }
 
 func TestReqData2Form(t *testing.T) {
+	// test case 1: normal json request
 	addr := fmt.Sprintf("http://%s/hi", GIN_SERVER_ADDR)
 	params := map[string]string{
 		"foo": "foo",
@@ -73,4 +79,18 @@ func TestReqData2Form(t *testing.T) {
 	}
 	log.Printf("ret:%s", string(b))
 
+	// test case 2: empty body request
+	addr = fmt.Sprintf("http://%s/uid", GIN_SERVER_ADDR)
+	request, _ = http.NewRequest("POST", addr, nil)
+	request.Header.Set("user_id", "abc")
+	rsp, err = http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rsp.Body.Close()
+	b, _ = ioutil.ReadAll(rsp.Body)
+	if string(b) != "abc" {
+		t.Fatal("rsp:", string(b), err)
+	}
+	log.Printf("ret:%s", string(b))
 }
