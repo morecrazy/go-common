@@ -181,6 +181,7 @@ func (kl *KafkaLogger) Length() int {
 func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFunc {
 	// init producer
 	config := kafka.NewConfig()
+	config.Producer.Retry.Max = 1
 	config.Producer.RequiredAcks = kafka.WaitForLocal
 	config.Producer.Flush.Frequency = 1 * time.Second
 	producer, err := kafka.NewAsyncProducer(brockerList, config)
@@ -233,11 +234,16 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 			StatusCode:  c.Writer.Status(),
 		}
 
-		inputChannel <- &kafka.ProducerMessage{
+		select {
+		case inputChannel <- &kafka.ProducerMessage{
 			Topic:     KAFKA_TOPIC,
 			Partition: partition,
 			Key:       kafka.StringEncoder(srvName),
 			Value:     m,
+		}:
+		// pass
+		case <-time.After(1 * time.Second):
+			log.Printf("[GinKafkaLogger] write timeout [req_id:%s][user_id:%s]", reqId, userId)
 		}
 
 		// log.Printf("kafka msg send:%+v", m)
