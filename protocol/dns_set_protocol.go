@@ -27,3 +27,10 @@ type GetDnsResp struct {
 	URL string `json:"url"`
 	RRs []RR   `json:"rrs"`
 }
+
+type GetAllDnsReq struct {
+}
+
+type GetAllDnsResp struct {
+	Records map[string][]RR
+}
