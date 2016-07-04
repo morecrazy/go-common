@@ -56,6 +56,7 @@ type Configure struct {
 	LogLevel      string
 	External      map[string]string
 	ExternalInt64 map[string]int64
+	GormDebug     bool
 }
 
 var Config *Configure
