@@ -30,6 +30,7 @@ func ginServer() {
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
 	engine.POST("/uid", uidHandler)
+	engine.POST("/json", reqJsonHanlder)
 	go engine.Run(GIN_SERVER_ADDR)
 	time.Sleep(2 * time.Second)
 }
@@ -49,6 +50,28 @@ func hiHandler(c *gin.Context) {
 	log.Printf("req:%#v", req)
 	log.Printf("req_user_id:%s", c.DefaultPostForm("req_user_id", "defaultValue"))
 	c.Writer.Write([]byte(req.UserId + req.Foo))
+}
+
+func reqJsonHanlder(c *gin.Context) {
+	expect := map[string]string{
+		"string": "test",
+		"pics":   `[{"url":"http://img3.codoon.com/f2cdae30-a"}]`,
+		"dict":   `{"label_content":"sport"}`,
+		"float":  "10.2",
+		"int":    "20",
+	}
+
+	for k, v1 := range expect {
+		v2 := c.PostForm(k)
+		if v1 != v2 {
+			log.Printf("[%s]!=[%s]", v1, v2)
+			c.Writer.Write([]byte("Error"))
+			return
+		}
+	}
+
+	c.Writer.Write([]byte("OK"))
+
 }
 
 func uidHandler(c *gin.Context) {
@@ -114,4 +137,34 @@ func TestReqData2Form(t *testing.T) {
 		t.Fatal("rsp:", string(b), err)
 	}
 	log.Printf("ret:%s", string(b))
+}
+
+func TestJsonReq(t *testing.T) {
+	addr := fmt.Sprintf("http://%s/json", GIN_SERVER_ADDR)
+	var pics interface{}
+	var dict interface{}
+	json.Unmarshal([]byte(`[{"url":"http://img3.codoon.com/f2cdae30-a"}]`), &pics)
+	json.Unmarshal([]byte(`{"label_content":"sport"}`), &dict)
+
+	params := map[string]interface{}{
+		"string": "test",
+		"pics":   pics,
+		"dict":   dict,
+		"float":  10.2,
+		"int":    20,
+	}
+
+	b, _ := json.Marshal(&params)
+	request, _ := http.NewRequest("POST", addr, bytes.NewReader(b))
+	rsp, err := http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rsp.Body.Close()
+	b, _ = ioutil.ReadAll(rsp.Body)
+	if string(b) != "OK" {
+		t.Fatal("rsp:", string(b), err)
+	}
+	log.Printf("ret:%s", string(b))
+
 }
