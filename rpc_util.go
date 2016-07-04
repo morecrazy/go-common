@@ -41,7 +41,9 @@ func NewRpcClient(addr, net string, func_map map[string]string, name string,
 func (client *RpcClient) Connect() (*rpc.Client, error) {
 	conn, err := net.DialTimeout(client.Net, client.Addr, 2*time.Second)
 	if err != nil {
-		client.logger.Error("get %s rpc client error :%v", client.name, err)
+		if nil != client.logger {
+			client.logger.Error("get %s rpc client error :%v", client.name, err)
+		}
 		return nil, err
 	}
 

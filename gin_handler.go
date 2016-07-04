@@ -82,10 +82,18 @@ func loadJson(r io.Reader) (map[string]interface{}, error) {
 func map2Form(v map[string]interface{}) url.Values {
 	form := url.Values{}
 	var vStr string
-	var ok bool
 	for key, value := range v {
-		if vStr, ok = value.(string); !ok {
+		switch value.(type) {
+		case string:
+			vStr = value.(string)
+		case float64, int, int64:
 			vStr = fmt.Sprintf("%v", value)
+		default:
+			if b, err := json.Marshal(&value); err != nil {
+				vStr = fmt.Sprintf("%v", value)
+			} else {
+				vStr = string(b)
+			}
 		}
 		form.Set(key, vStr)
 	}
@@ -181,6 +189,7 @@ func (kl *KafkaLogger) Length() int {
 func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFunc {
 	// init producer
 	config := kafka.NewConfig()
+	config.Producer.Retry.Max = 1
 	config.Producer.RequiredAcks = kafka.WaitForLocal
 	config.Producer.Flush.Frequency = 1 * time.Second
 	producer, err := kafka.NewAsyncProducer(brockerList, config)
@@ -233,11 +242,16 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 			StatusCode:  c.Writer.Status(),
 		}
 
-		inputChannel <- &kafka.ProducerMessage{
+		select {
+		case inputChannel <- &kafka.ProducerMessage{
 			Topic:     KAFKA_TOPIC,
 			Partition: partition,
 			Key:       kafka.StringEncoder(srvName),
 			Value:     m,
+		}:
+		// pass
+		case <-time.After(1 * time.Second):
+			log.Printf("[GinKafkaLogger] write timeout [req_id:%s][user_id:%s]", reqId, userId)
 		}
 
 		// log.Printf("kafka msg send:%+v", m)

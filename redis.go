@@ -135,6 +135,28 @@ func (cache *Cache) Incrby(key string, value int) (int, error) {
 	return res, err
 }
 
+func (cache *Cache) Decr(key string) (int, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := redis.Int(conn.Do("DECR", key))
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
+func (cache *Cache) Decrby(key string, value int) (int, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := redis.Int(conn.Do("DECRBY", key, value))
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) MGet(key []interface{}) (interface{}, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
@@ -443,6 +465,75 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 		err = NewInternalError(CacheErrCode, err)
 	}
 	return res, err
+}
+
+// 判断某个对象是否存在 存在返回true 不存在返回false
+// for SimpleSortedSet
+// update by wuql 2016-6-28
+func (cache *Cache) IsMember(key, member string) bool {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	res, err := conn.Do("ZSCORE", key, member)
+	// res为score(value)
+	if res != nil && err == nil {
+		return true
+	} else {
+		return false
+	}
+}
+
+// 批量插入 for SortedSet（有序集合）
+// score_member_list: score1, member2, score2, member2...
+// update by wuql 2016-6-24
+func (cache *Cache) ZaddBatch(key string, score_member_list []interface{}) (interface{}, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	// 必须是:score(value) member(key)  数据对
+	// len(score_member_list) >= 2 && len(score_member_list)%2 == 0
+	res, err := conn.Do("ZADD", score_member_list...)
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
+// ZREM命令从有序集合存储键删除指定成员
+// update by wuql 2016-6-24
+func (cache *Cache) Zrem(key, member string) (interface{}, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+
+	res, err := conn.Do("ZREM", key, member)
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
+// Set the value of key ``name`` to ``value`` if key doesn't exist"
+// "Set the value of key ``key`` to ``value`` if key exist"
+// update by wuql 2016-6-27
+func (cache *Cache) ENSet(key string, value interface{}) (interface{}, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	is_exist, err := cache.Exists(key)
+	if err == nil {
+		if is_exist == true {
+			res, err := conn.Do("SETEX", key, value)
+			if nil != err && !strings.Contains(err.Error(), "nil returned") {
+				err = NewInternalError(CacheErrCode, err)
+			}
+			return res, err
+		} else {
+			res, err := conn.Do("SETNX", key, value)
+			if nil != err && !strings.Contains(err.Error(), "nil returned") {
+				err = NewInternalError(CacheErrCode, err)
+			}
+			return res, err
+		}
+	} else {
+		return nil, err
+	}
 }
 
 func (cache *Cache) Zadd(key string, value, member interface{}) (interface{}, error) {
