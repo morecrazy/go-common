@@ -3,6 +3,7 @@ package common
 import (
 	"database/sql"
 	"fmt"
+	_ "third/go-sql-driver/mysql"
 	"third/gorm"
 )
 
