@@ -8,3 +8,12 @@ func Cuts(s string, n int) string {
 		return s
 	}
 }
+
+func StrIn(s string, arr []string) bool {
+	for _, a := range arr {
+		if a == s {
+			return true
+		}
+	}
+	return false
+}
