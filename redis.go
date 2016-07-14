@@ -407,6 +407,24 @@ func (cache *Cache) Zrevrange(key string, start, end int, withscores bool) ([]in
 	return res, err
 }
 
+//add by yuan xiang
+func (cache *Cache) ZrevrangeString(key string, start, end int, withscores bool) ([]string, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	var res []string
+	var err error
+	if withscores {
+		res, err = redis.Strings(conn.Do("ZREVRANGE", key, start, end, "withscores"))
+	} else {
+		res, err = redis.Strings(conn.Do("ZREVRANGE", key, start, end))
+	}
+
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
 func (cache *Cache) ZrevrangeByScore(key string, max_num, min_num int, withscores bool, offset, count int) ([]int, error) {
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
@@ -523,6 +541,18 @@ func (cache *Cache) Zadd(key string, value, member interface{}) (interface{}, er
 	defer conn.Close()
 
 	res, err := conn.Do("ZADD", key, value, member)
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		err = NewInternalError(CacheErrCode, err)
+	}
+	return res, err
+}
+
+//add by yuan xiang
+func (cache *Cache) Zcard(key string) (int, error) {
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+
+	res, err := redis.Int(conn.Do("ZCARD", key))
 	if nil != err && !strings.Contains(err.Error(), "nil returned") {
 		err = NewInternalError(CacheErrCode, err)
 	}

@@ -56,6 +56,9 @@ type Configure struct {
 	LogLevel      string
 	External      map[string]string
 	ExternalInt64 map[string]int64
+	GormDebug     bool               //sql 输出开关
+	StaticDir     string             //静态文件目录设置
+	Environment   string             //环境变量区分
 }
 
 var Config *Configure

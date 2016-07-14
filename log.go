@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"third/go-logging"
+	"third/raven-go"
 )
 
 var Logger *logging.Logger
@@ -65,7 +66,18 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	backend_err_leveld := logging.AddModuleLevel(backend_err_formatter)
 	backend_err_leveld.SetLevel(logging.WARNING, "")
 
-	logging.SetBackend(backend_info_leveld, backend_err_leveld)
+	//add sentry log author:yuanxiang
+	sentry_client, err := raven.NewWithTags(Config.SentryUrl, map[string]string{"redpacket": "redpacket"})
+	if nil != err {
+		log.Fatalf("init sentry client err")
+		return nil, err
+	}
+	sentry_err := logging.NewSentryBackend(sentry_client, logging.ERROR)
+	sentry_formatter := logging.NewBackendFormatter(sentry_err, format)
+	sentry_err_leveld := logging.AddModuleLevel(sentry_formatter)
+	sentry_err_leveld.SetLevel(logging.ERROR, "")
+
+	logging.SetBackend(backend_info_leveld, backend_err_leveld, sentry_err_leveld)
 
 	return Logger, err
 }

@@ -18,10 +18,11 @@ func InitSentryClient() error {
 	return nil
 }
 
-func InitSentryClientWithUrl(url string) error {
+//add tag to param; modify by yuanxiang
+func InitSentryClientWithUrl(url string, tag map[string]string) error {
 	var err error
 	fmt.Println(url)
-	SentryClient, err = raven.NewWithTags(url, map[string]string{"blast": "test"})
+	SentryClient, err = raven.NewWithTags(url, tag)
 	if nil != err {
 		Logger.Error("init sentry client err")
 		return err
