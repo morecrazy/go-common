@@ -6,7 +6,8 @@ import (
 	"testing"
 )
 
-func TestGenCityCode(t *testing.T) {
+// just used to generate city-code map
+func _TestGenCityCode(t *testing.T) {
 	NAME2CODE := map[string]string{}
 	for k, v := range CODE2NAME {
 		NAME2CODE[v] = k

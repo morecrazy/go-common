@@ -63,7 +63,7 @@ func Gauge(bucket string, v ...string) {
 func bucketName(sn, host, path, method string, httpCode int) string {
 	host = _reg.ReplaceAllString(host, "_")
 	path = _reg.ReplaceAllString(path, "_")
-	return fmt.Sprintf("%s.%s.%d.%s_%s", sn, host, path, method, httpCode)
+	return fmt.Sprintf("%s.%s.%d.%s_%s", sn, host, httpCode, path, method)
 
 }
 
