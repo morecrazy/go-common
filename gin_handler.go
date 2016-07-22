@@ -18,17 +18,18 @@ import (
 	"time"
 )
 
-// ReqData2Form try to parse request body as json and inject user_id from header to body, if failed, deal with it as form.
+// ReqData2Form try to parse request (from apiMiddleWare) body as json and inject user_id from header to body, if failed, deal with it as form.
 // It should be called before your business logic.
 func ReqData2Form() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userId := c.Request.Header.Get(CODOON_USER_ID)
-		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
+		if c.Request.Header.Get("MiddleWare") == "ON" {
 			data, err := ioutil.ReadAll(c.Request.Body)
 			if err != nil {
 				log.Printf("read request body error:%v", err)
 				return
 			}
+			// fmt.Printf("raw body:%s\n", data)
 			var v map[string]interface{}
 			if len(data) == 0 {
 				v = make(map[string]interface{})
@@ -38,19 +39,8 @@ func ReqData2Form() gin.HandlerFunc {
 			}
 			if err != nil {
 				// if request data is NOT json format, restore body
-				// log.Printf("restore %s to body", string(data))
-				values, err := url.ParseQuery(string(data))
-				if err != nil {
-					log.Printf("parse body data to url values error:%v", err)
-					c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
-				} else {
-					c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-					// if request data is form format, set user_id only when user_id of values is empty.
-					if values.Get(CODOON_USER_ID) == "" {
-						values.Set(CODOON_USER_ID, userId)
-					}
-					c.Request.Body = ioutil.NopCloser(strings.NewReader(values.Encode()))
-				}
+				log.Printf("ReqData2Form parse as json failed. restore [%s] to body", string(data))
+				c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
 			} else {
 				// if user_id in request is not empty, move it to req_user_id
 				if uid, ok := v[CODOON_USER_ID]; ok {
@@ -60,8 +50,15 @@ func ReqData2Form() gin.HandlerFunc {
 				v[CODOON_USER_ID] = userId
 				form := map2Form(v)
 				s := form.Encode()
-				c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-				c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
+				if c.Request.Method == "POST" || c.Request.Method == "PUT" {
+					c.Request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+					c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
+				} else if c.Request.Method == "GET" || c.Request.Method == "DELETE" {
+					c.Request.Header.Del("Content-Type")
+					c.Request.URL.RawQuery = form.Encode()
+				} else {
+					c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
+				}
 			}
 		}
 	}

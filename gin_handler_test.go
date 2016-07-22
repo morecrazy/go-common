@@ -29,6 +29,7 @@ func ginServer() {
 	// engine.Use(GinKafkaLogger("common-test", "ct", []string{"192.168.1.204:9092"}))
 	engine.Use(ReqData2Form())
 	engine.POST("/hi", hiHandler)
+	engine.GET("/hi", hiHandler)
 	engine.POST("/uid", uidHandler)
 	engine.POST("/json", reqJsonHanlder)
 	go engine.Run(GIN_SERVER_ADDR)
@@ -47,7 +48,7 @@ func hiHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ret": "bind failed"})
 		return
 	}
-	log.Printf("req:%#v", req)
+	log.Printf("%s req:%#v", c.Request.Method, req)
 	log.Printf("req_user_id:%s", c.DefaultPostForm("req_user_id", "defaultValue"))
 	c.Writer.Write([]byte(req.UserId + req.Foo))
 }
@@ -92,6 +93,7 @@ func TestReqData2Form(t *testing.T) {
 
 	request, _ := http.NewRequest("POST", addr, bytes.NewReader(b))
 	request.Header.Set("user_id", "abc")
+	request.Header.Set("MiddleWare", "ON")
 	rsp, err := http.DefaultClient.Do(request)
 	if err != nil {
 		t.Fatal(err)
@@ -106,6 +108,7 @@ func TestReqData2Form(t *testing.T) {
 	// test case 2: empty body request
 	addr = fmt.Sprintf("http://%s/uid", GIN_SERVER_ADDR)
 	request, _ = http.NewRequest("POST", addr, nil)
+	request.Header.Set("MiddleWare", "ON")
 	request.Header.Set("user_id", "abc")
 	rsp, err = http.DefaultClient.Do(request)
 	if err != nil {
@@ -126,6 +129,28 @@ func TestReqData2Form(t *testing.T) {
 	}
 	b, _ = json.Marshal(&params)
 	request, _ = http.NewRequest("POST", addr, bytes.NewReader(b))
+	request.Header.Set("MiddleWare", "ON")
+	request.Header.Set("user_id", "abc")
+	rsp, err = http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rsp.Body.Close()
+	b, _ = ioutil.ReadAll(rsp.Body)
+	if string(b) != "abcfoo" {
+		t.Fatal("rsp:", string(b), err)
+	}
+	log.Printf("ret:%s", string(b))
+
+	// test case 4: Get request
+	addr = fmt.Sprintf("http://%s/hi", GIN_SERVER_ADDR)
+	params = map[string]string{
+		"foo":  "foo",
+		"time": time.Now().String(),
+	}
+	b, _ = json.Marshal(&params)
+	request, _ = http.NewRequest("GET", addr, bytes.NewReader(b))
+	request.Header.Set("MiddleWare", "ON")
 	request.Header.Set("user_id", "abc")
 	rsp, err = http.DefaultClient.Do(request)
 	if err != nil {
