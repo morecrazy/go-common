@@ -90,10 +90,10 @@ func (r *AMQPReceipt) Publish(queue_name string, payload []byte) error {
 	)
 }
 
-var amqpReceipt AMQPReceipt
+var AmqpReceipt AMQPReceipt
 
 func InitRabbitmqClient(uri, queue string) error {
-	return amqpReceipt.Connect(uri, queue, false)
+	return AmqpReceipt.Connect(uri, queue, false)
 }
 
 type AmqpMessage struct {
