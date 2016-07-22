@@ -1,7 +1,6 @@
 package common
 
 import (
-	"backend/common"
 	"sync"
 	"third/amqp"
 	"time"
@@ -41,13 +40,13 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 
 	conn, err := amqp.Dial(uri)
 	if err != nil {
-		common.Errorf("amqp dial error :%v", err)
+		Errorf("amqp dial error :%v", err)
 		return
 	}
 
 	r.channel, err = conn.Channel()
 	if err != nil {
-		common.Errorf("conn.Channel error :%v", err)
+		Errorf("conn.Channel error :%v", err)
 		return
 	}
 	r.alive = true
@@ -67,7 +66,7 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 	//	common.Infof("amqpMessagePool get new")
 	//	return &message
 	//}
-	common.Noticef("amqp connect success ")
+	Noticef("amqp connect success ")
 	return
 }
 
@@ -149,7 +148,7 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 	amqpMessages := make(chan *AmqpMessage, rate)
 	go func() {
 		for d := range deliveries {
-			common.Noticef("amqp recv message")
+			Noticef("amqp recv message")
 			/*
 				message := amqpMessagePool.Get()
 				switch message.(type) {
@@ -181,7 +180,7 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 			message.Receipt.Ack()
 		}
 		// connection was lost
-		common.Errorf("!!!!!!!!amqp quit, close channel!!!!!!!!!!!!!!!")
+		Errorf("!!!!!!!!amqp quit, close channel!!!!!!!!!!!!!!!")
 		r.alive = false
 		close(amqpMessages)
 	}()
