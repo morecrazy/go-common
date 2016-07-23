@@ -55,8 +55,8 @@ func GetVersionCompare(c *gin.Context, b_version string) (int, error) {
 		}
 		return a
 	}
-	//
-	if user_agent := header.Get("HTTP_USER_AGENT"); user_agent != "" {
+	// why User-Agent
+	if user_agent := header.Get("User-Agent"); user_agent != "" {
 		if version, ok := FormatUserAgent(user_agent)["version"]; ok {
 			if a_version, ok := version.(string); ok {
 				al := strings.Split(a_version, ".")
