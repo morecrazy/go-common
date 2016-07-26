@@ -467,7 +467,7 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 	return res, err
 }
 
-func (cache *Cache) Zrevrank(key, member string) (interface{}, error) {
+func (cache *Cache) Zrevrank(key, member string) (int64, error) {
 	/*
 		获取排名
 		Returns a 0-based value indicating the descending rank of
@@ -480,12 +480,11 @@ func (cache *Cache) Zrevrank(key, member string) (interface{}, error) {
 	*/
 	conn := cache.RedisPool().Get()
 	defer conn.Close()
-	rank, err := conn.Do("ZREVRANK", key, member)
-	// rank type
-	if rank != nil && err == nil {
-		return rank, nil
-	} else {
+	rank, err := redis.Int64(conn.Do("ZREVRANK", key, member))
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
 		return 0, err
+	} else {
+		return rank + 1, nil
 	}
 }
 
