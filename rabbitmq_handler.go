@@ -2,6 +2,7 @@ package common
 
 import (
 	"sync"
+	"runtime/debug"
 	"third/amqp"
 	"time"
 )
@@ -60,12 +61,12 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 		false, // noWait
 		arguments,
 	)
-	//amqpMessagePool.New = func() interface{} {
-	//	var message AmqpMessage
-	//	message.Receipt = r
-	//	common.Infof("amqpMessagePool get new")
-	//	return &message
-	//}
+	amqpMessagePool.New = func() interface{} {
+		var message AmqpMessage
+		message.Receipt = r
+		Infof("amqpMessagePool get new")
+		return &message
+	}
 	Noticef("amqp connect success ")
 	return
 }
@@ -118,14 +119,13 @@ func NewAmqpMessage(r *AMQPReceipt) *AmqpMessage {
 
 func PutMessage(message *AmqpMessage) {
 	//message.Receipt.Ack()
-	/*
-		if nil != message {
-			amqpMessagePool.Put(message)
-		} else {
-			common.Errorf("put nil message")
-			common.Infof(string(debug.Stack()))
-		}
-	*/
+
+	if nil != message {
+		amqpMessagePool.Put(message)
+	} else {
+		Errorf("put nil message")
+		Infof(string(debug.Stack()))
+	}
 }
 
 func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMessage, error) {
@@ -148,36 +148,38 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 	amqpMessages := make(chan *AmqpMessage, rate)
 	go func() {
 		for d := range deliveries {
-			Noticef("amqp recv message")
-			/*
-				message := amqpMessagePool.Get()
-				switch message.(type) {
-				case *AmqpMessage:
-					message.(*AmqpMessage).Body = d.Body
-					message.(*AmqpMessage).ContentType = d.ContentType
-					message.(*AmqpMessage).Receipt.delivery = &d
-					message.(*AmqpMessage).Acked = false
-					message.(*AmqpMessage).ConnMessageId = 0
-					message.(*AmqpMessage).LastSendTime = 0
-					message.(*AmqpMessage).MessageId = 0
-					message.(*AmqpMessage).RetryTime = 0
-					amqpMessages <- message.(*AmqpMessage)
-				default:
-					common.Errorf("pool type error :%T", message)
-				}
-			*/
+			Infof("amqp recv message")
 
-			message := NewAmqpMessage(r)
-			message.Body = d.Body
-			message.ContentType = d.ContentType
-			message.Receipt.delivery = &d
-			message.Acked = false
-			message.ConnMessageId = 0
-			message.LastSendTime = 0
-			message.MessageId = 0
-			message.RetryTime = 0
-			amqpMessages <- message
-			message.Receipt.Ack()
+			message := amqpMessagePool.Get()
+			switch message.(type) {
+			case *AmqpMessage:
+				message.(*AmqpMessage).Body = d.Body
+				message.(*AmqpMessage).ContentType = d.ContentType
+				message.(*AmqpMessage).Receipt.delivery = &d
+				message.(*AmqpMessage).Acked = false
+				message.(*AmqpMessage).ConnMessageId = 0
+				message.(*AmqpMessage).LastSendTime = 0
+				message.(*AmqpMessage).MessageId = 0
+				message.(*AmqpMessage).RetryTime = 0
+				amqpMessages <- message.(*AmqpMessage)
+				message.(*AmqpMessage).Receipt.Ack()
+			default:
+				Errorf("pool type error :%T", message)
+			}
+
+			/*
+				message := NewAmqpMessage(c)
+				message.Body = d.Body
+				message.ContentType = d.ContentType
+				message.Receipt.delivery = &d
+				message.Acked = false
+				message.ConnMessageId = 0
+				message.LastSendTime = 0
+				message.MessageId = 0
+				message.RetryTime = 0
+				amqpMessages <- message
+				message.Receipt.Ack()
+			*/
 		}
 		// connection was lost
 		Errorf("!!!!!!!!amqp quit, close channel!!!!!!!!!!!!!!!")
