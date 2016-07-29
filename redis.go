@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"third/redigo/redis"
@@ -663,4 +664,21 @@ func (cache *Cache) SetTimeLock(id string, time_out int64) (flag bool, err error
 	}
 	flag = true
 	return
+}
+
+// by liudan 2016.07.29
+func (cache *Cache) GetJsonObj(key string, obj interface{}) error {
+	data, err := cache.Get(key)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, obj)
+}
+
+func (cache *Cache) SaveJsonObj(key string, obj interface{}, timeout int) error {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+	return cache.Set(key, data, timeout)
 }
