@@ -43,9 +43,9 @@ func InitRpcClient() error {
 	return nil
 }
 
-func InitRelationRpcClient() error {
+func InitRelationRpcClient(addr string, net string) error {
 	var err error
-	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserRelationSetting"].Addr, Config.RpcSetting["UserRelationSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
+	UserRelationClient, err = NewRpcClient(addr, net, UserRelationRpcFuncMap, "userrelation", Logger)
 	if err != nil {
 		Logger.Error("init UserRelationClient err :", err.Error())
 	}
