@@ -1,9 +1,9 @@
 package common
 
 import (
-	"third/gorm"
-
 	. "backend/common/protocol"
+	"fmt"
+	"third/gorm"
 )
 
 var UserProfileClient *RpcClient
@@ -14,6 +14,7 @@ var SportsSortClinet *RpcClient
 
 func InitRpcClient() error {
 	var err error
+
 	UserProfileClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserprofileRpcFuncMap, "userprofile", Logger)
 	if err != nil {
 		Logger.Error("init UserProfileClient err :", err.Error())
@@ -40,6 +41,15 @@ func InitRpcClient() error {
 	}
 
 	return nil
+}
+
+func InitRelationRpcClient() error {
+	var err error
+	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserRelationSetting"].Addr, Config.RpcSetting["UserRelationSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
+	if err != nil {
+		Logger.Error("init UserRelationClient err :", err.Error())
+	}
+	return err
 }
 
 // 只使用 GetProfile的接口，单独初始化
@@ -174,6 +184,41 @@ func GetFollowing(user_id string) (following_ids []string, err error) {
 	}
 
 	return following_ids, err
+}
+
+// 返回值 0 未关注  1 已关注 2 互相关注
+func GetFollowingFlag(user_id, target_user_id string) (int, error) {
+
+	params := map[string]string{"Selfuserid": user_id, "Targetuserid": target_user_id}
+	var reply GetFlagRes
+
+	err := UserRelationClient.Call("get_following_flag", params, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		return 0, err
+	}
+
+	return reply.Data, nil
+
+}
+
+func FollowPeople(user_id, target_user_id string) error {
+	if "" == user_id || "" == target_user_id || user_id == target_user_id {
+		return fmt.Errorf("%s", "params error")
+	}
+	var followReq FollowingReq
+	var followRes FollowingRes
+	followReq.Selfuserid = user_id
+	followReq.Targetuserid = target_user_id
+
+	err := UserRelationClient.Call("get_following_flag", &followReq, &followRes)
+	if err != nil {
+		Logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+
 }
 
 func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
