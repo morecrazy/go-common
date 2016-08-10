@@ -63,6 +63,16 @@ func InitProfileClient(addr string, net string) error {
 	return nil
 }
 
+func InitUserLoginClient(addr string, net string) error {
+	var err error
+	UserLoginClient, err = NewRpcClient(addr, net, UserloginRpcFuncMap, "userlogin", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetProfileById(userId string) (UserProfile, error) {
 	if userId == "" {
 		return UserProfile{}, gorm.RecordNotFound
@@ -109,7 +119,9 @@ func GetLoginById(userId string) (UserLogin, error) {
 	//	Logger.Debug("GetProfileById %v", args)
 	err := UserLoginClient.Call("get", &args, &reply)
 	if err != nil {
-		Logger.Error(err.Error())
+		if nil != Logger {
+			Logger.Error(err.Error())
+		}
 		err = NewInternalError(RPCErrCode, err)
 	}
 

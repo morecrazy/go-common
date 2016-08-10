@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,71 @@ import (
 	"third/httprouter"
 	"time"
 )
+
+func GetVersionCompare(c *gin.Context, b_version string) (int, error) {
+	/*
+		add by wuql 2016-7-23
+		直接使用字符串比较
+		从header中取出版本号a_version, 与待比较版本b_version比较
+		0 : a_version 	== 	b_version
+		1 : a_version 	> 	b_version
+		-1: a_version 	< 	b_version
+	*/
+
+	header := c.Request.Header
+	// 获取子版本号中最长的一个如 [1, 239, 45]
+	// 返回3
+	getMaxLen := func(al, bl []string) int {
+		maxlen := 0
+		for _, i := range al {
+			if len(i) > maxlen {
+				maxlen = len(i)
+			}
+		}
+		for _, i := range bl {
+			if len(i) > maxlen {
+				maxlen = len(i)
+			}
+		}
+		return maxlen
+	}
+	//字符串填充
+	zFill := func(a string, length int) string {
+		if len(a) < length {
+			r := ""
+			for i := 0; i < length-len(a); i++ {
+				r += "0"
+			}
+			return r + a
+		}
+		return a
+	}
+	// why User-Agent
+	if user_agent := header.Get("User-Agent"); user_agent != "" {
+		if version, ok := FormatUserAgent(user_agent)["version"]; ok {
+			if a_version, ok := version.(string); ok {
+				al := strings.Split(a_version, ".")
+				bl := strings.Split(b_version, ".")
+				maxlen := getMaxLen(al, bl)
+				ac, bc := "", ""
+				for _, i := range al {
+					ac = ac + zFill(i, maxlen) + "."
+				}
+				for _, i := range bl {
+					bc = bc + zFill(i, maxlen) + "."
+				}
+				return strings.Compare(ac, bc), nil
+			} else {
+				return 0, errors.New("获取版本失败1")
+			}
+		} else {
+			return 0, errors.New("获取版本失败2")
+		}
+	} else {
+		return 0, errors.New("获取版本失败3")
+	}
+	return 0, nil
+}
 
 func CodoonGetHeader(c *gin.Context) {
 	// 获取token

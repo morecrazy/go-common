@@ -467,6 +467,27 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 	return res, err
 }
 
+func (cache *Cache) Zrevrank(key, member string) (int64, error) {
+	/*
+		获取排名
+		Returns a 0-based value indicating the descending rank of
+		``value`` in sorted set ``key``
+		for SimpleSortedSet
+
+		** rank start from 0 **
+
+		update by wuql 2016-7-25
+	*/
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	rank, err := redis.Int64(conn.Do("ZREVRANK", key, member))
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		return 0, err
+	} else {
+		return rank + 1, nil
+	}
+}
+
 // 判断某个对象是否存在 存在返回true 不存在返回false
 // for SimpleSortedSet
 // update by wuql 2016-6-28
