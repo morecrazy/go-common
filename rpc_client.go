@@ -223,7 +223,7 @@ func FollowPeople(user_id, target_user_id string) error {
 	followReq.Selfuserid = user_id
 	followReq.Targetuserid = target_user_id
 
-	err := UserRelationClient.Call("get_following_flag", &followReq, &followRes)
+	err := UserRelationClient.Call("follow", &followReq, &followRes)
 	if err != nil {
 		Logger.Error(err.Error())
 		return err
