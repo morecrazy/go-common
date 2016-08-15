@@ -55,6 +55,13 @@ func ReqData2Form() gin.HandlerFunc {
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
 				} else if c.Request.Method == "GET" || c.Request.Method == "DELETE" {
 					c.Request.Header.Del("Content-Type")
+					// append url values
+					urlValues := c.Request.URL.Query()
+					for k, vv := range urlValues {
+						if _, ok := form[k]; !ok {
+							form[k] = vv
+						}
+					}
 					c.Request.URL.RawQuery = form.Encode()
 				} else {
 					c.Request.Body = ioutil.NopCloser(strings.NewReader(s))
