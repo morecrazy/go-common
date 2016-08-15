@@ -85,7 +85,9 @@ func (client *RpcClient) Call(method string, args interface{}, reply interface{}
 
 func (client *RpcClient) DirectCall(method string, args interface{}, reply interface{}) error {
 	if "add_picture" != method {
-		client.logger.Info("call rpc : %s, %v", method, args)
+		if nil != client.logger {
+			client.logger.Info("call rpc : %s, %v", method, args)
+		}
 	}
 
 	err := client.rpc_client.CallTimeout(client.func_map[method], args, reply, 2*time.Second)
