@@ -67,7 +67,7 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 	backend_err_leveld.SetLevel(logging.WARNING, "")
 
 	//add sentry log author:yuanxiang
-	sentry_client, err := raven.NewWithTags(Config.SentryUrl, map[string]string{"redpacket": "redpacket"})
+	sentry_client, err := raven.NewWithTags(Config.SentryUrl, map[string]string{"servicename": "servicename"})
 	if nil != err {
 		log.Fatalf("init sentry client err")
 		return nil, err

@@ -1,9 +1,9 @@
 package common
 
 import (
-	"third/gorm"
-
 	. "backend/common/protocol"
+	"fmt"
+	"third/gorm"
 )
 
 var UserProfileClient *RpcClient
@@ -14,6 +14,7 @@ var SportsSortClinet *RpcClient
 
 func InitRpcClient() error {
 	var err error
+
 	UserProfileClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserprofileRpcFuncMap, "userprofile", Logger)
 	if err != nil {
 		Logger.Error("init UserProfileClient err :", err.Error())
@@ -42,10 +43,29 @@ func InitRpcClient() error {
 	return nil
 }
 
+func InitRelationRpcClient(addr string, net string) error {
+	var err error
+	UserRelationClient, err = NewRpcClient(addr, net, UserRelationRpcFuncMap, "userrelation", Logger)
+	if err != nil {
+		Logger.Error("init UserRelationClient err :", err.Error())
+	}
+	return err
+}
+
 // 只使用 GetProfile的接口，单独初始化
 func InitProfileClient(addr string, net string) error {
 	var err error
 	UserProfileClient, err = NewRpcClient(addr, net, UserprofileRpcFuncMap, "userprofile", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InitUserLoginClient(addr string, net string) error {
+	var err error
+	UserLoginClient, err = NewRpcClient(addr, net, UserloginRpcFuncMap, "userlogin", nil)
 	if err != nil {
 		return err
 	}
@@ -99,7 +119,9 @@ func GetLoginById(userId string) (UserLogin, error) {
 	//	Logger.Debug("GetProfileById %v", args)
 	err := UserLoginClient.Call("get", &args, &reply)
 	if err != nil {
-		Logger.Error(err.Error())
+		if nil != Logger {
+			Logger.Error(err.Error())
+		}
 		err = NewInternalError(RPCErrCode, err)
 	}
 
@@ -174,6 +196,41 @@ func GetFollowing(user_id string) (following_ids []string, err error) {
 	}
 
 	return following_ids, err
+}
+
+// 返回值 0 未关注  1 已关注 2 互相关注
+func GetFollowingFlag(user_id, target_user_id string) (int, error) {
+
+	params := map[string]string{"Selfuserid": user_id, "Targetuserid": target_user_id}
+	var reply GetFlagRes
+
+	err := UserRelationClient.Call("get_following_flag", params, &reply)
+	if err != nil {
+		Logger.Error(err.Error())
+		return 0, err
+	}
+
+	return reply.Data, nil
+
+}
+
+func FollowPeople(user_id, target_user_id string) error {
+	if "" == user_id || "" == target_user_id || user_id == target_user_id {
+		return fmt.Errorf("%s", "params error")
+	}
+	var followReq FollowingReq
+	var followRes FollowingRes
+	followReq.Selfuserid = user_id
+	followReq.Targetuserid = target_user_id
+
+	err := UserRelationClient.Call("follow", &followReq, &followRes)
+	if err != nil {
+		Logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+
 }
 
 func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
