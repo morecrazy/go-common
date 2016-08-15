@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"third/redigo/redis"
@@ -467,6 +468,27 @@ func (cache *Cache) Zscore(key, member string) (interface{}, error) {
 	return res, err
 }
 
+func (cache *Cache) Zrevrank(key, member string) (int64, error) {
+	/*
+		获取排名
+		Returns a 0-based value indicating the descending rank of
+		``value`` in sorted set ``key``
+		for SimpleSortedSet
+
+		** rank start from 0 **
+
+		update by wuql 2016-7-25
+	*/
+	conn := cache.RedisPool().Get()
+	defer conn.Close()
+	rank, err := redis.Int64(conn.Do("ZREVRANK", key, member))
+	if nil != err && !strings.Contains(err.Error(), "nil returned") {
+		return 0, err
+	} else {
+		return rank + 1, nil
+	}
+}
+
 // 判断某个对象是否存在 存在返回true 不存在返回false
 // for SimpleSortedSet
 // update by wuql 2016-6-28
@@ -663,4 +685,21 @@ func (cache *Cache) SetTimeLock(id string, time_out int64) (flag bool, err error
 	}
 	flag = true
 	return
+}
+
+// by liudan 2016.07.29
+func (cache *Cache) GetJsonObj(key string, obj interface{}) error {
+	data, err := cache.Get(key)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, obj)
+}
+
+func (cache *Cache) SaveJsonObj(key string, obj interface{}, timeout int) error {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+	return cache.Set(key, data, timeout)
 }

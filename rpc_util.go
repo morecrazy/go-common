@@ -83,9 +83,42 @@ func (client *RpcClient) Call(method string, args interface{}, reply interface{}
 	return err
 }
 
+func (client *RpcClient) CallMethod(method string, args interface{}, reply interface{}) error {
+	if "add_picture" != method {
+		if nil != client.logger {
+			client.logger.Debug("call rpc : %s, %v", method, args)
+		}
+	}
+	rpc_client, err := client.pool.Get()
+	if err != nil {
+		if nil != client.logger {
+			client.logger.Error("get %s rpc client error :%v", client.name, err)
+		}
+		return err
+	}
+	defer rpc_client.Close()
+	err = rpc_client.CallTimeout(method, args, reply, 2, 60*time.Second)
+	if err != nil {
+		is_user_err, _, _ := IsUserErr(err)
+		if is_user_err {
+			if nil != client.logger {
+				client.logger.Notice("call %s rpc client err :%s,%v", client.name, method, err)
+			}
+		} else {
+			if nil != client.logger {
+				client.logger.Error("call %s rpc client err :%s,%v", client.name, method, err)
+			}
+		}
+	}
+
+	return err
+}
+
 func (client *RpcClient) DirectCall(method string, args interface{}, reply interface{}) error {
 	if "add_picture" != method {
-		client.logger.Info("call rpc : %s, %v", method, args)
+		if nil != client.logger {
+			client.logger.Info("call rpc : %s, %v", method, args)
+		}
 	}
 
 	err := client.rpc_client.CallTimeout(client.func_map[method], args, reply, 2*time.Second)

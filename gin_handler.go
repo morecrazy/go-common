@@ -182,6 +182,29 @@ func (kl *KafkaLogger) Length() int {
 	return len(b)
 }
 
+func GinLogTracer(srvName, srvCode, name string) gin.HandlerFunc {
+	brokers, err := LoadContentFromEtcd([]string{"http://etcd.in.codoon.com:2379"}, name, "/online")
+	if err != nil {
+		log.Fatalf("Fetch kafka log brokers error:%v", err)
+	}
+
+	bytes := []byte(brokers)
+	var res map[string]interface{}
+
+	err = json.Unmarshal(bytes, &res)
+	if err != nil {
+		log.Println("Failed to unmarshal bytes:", err)
+	}
+	brokerList := []string{}
+
+	list := res["KafkaBrokerList"].([]interface{})
+	for _, value := range list {
+		broker := value.(string)
+		brokerList = append(brokerList, broker)
+	}
+	return GinKafkaLogger(srvName, srvCode, brokerList)
+}
+
 // GinKafkaLogger
 func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFunc {
 	// init producer
