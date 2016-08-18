@@ -12,6 +12,7 @@ type AMQPReceipt struct {
 	alive    bool
 	i        int
 	channel  *amqp.Channel
+	openMu  sync.Mutex
 	delivery *amqp.Delivery
 }
 
@@ -35,6 +36,8 @@ func (r *AMQPReceipt) Reject() {
 //}
 
 func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error) {
+	r.openMu.Lock()
+	defer r.openMu.Unlock()
 	if r.alive {
 		return
 	}
@@ -92,9 +95,17 @@ func (r *AMQPReceipt) Publish(queue_name string, payload []byte) error {
 }
 
 var AmqpReceipt AMQPReceipt
+var amqp_client_uri string
+var amqp_client_queue string
 
 func InitRabbitmqClient(uri, queue string) error {
+	amqp_client_uri = uri
+	amqp_client_queue = queue
 	return AmqpReceipt.Connect(uri, queue, false)
+}
+
+func ReconnAmqpClient() error {
+	return AmqpReceipt.Connect(amqp_client_uri, amqp_client_queue, false)
 }
 
 type AmqpMessage struct {
