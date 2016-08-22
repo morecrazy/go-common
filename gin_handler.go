@@ -221,7 +221,7 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 	config.Producer.Flush.Frequency = 1 * time.Second
 	producer, err := kafka.NewAsyncProducer(brockerList, config)
 	if err != nil {
-		log.Fatalf("create producer error:%v", err)
+		log.Printf("create producer error:%v", err)
 	}
 	inputChannel := producer.Input()
 	// monitor kafka error
