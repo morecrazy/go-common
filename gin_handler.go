@@ -192,7 +192,7 @@ func (kl *KafkaLogger) Length() int {
 func GinLogTracer(srvName, srvCode, name string) gin.HandlerFunc {
 	brokers, err := LoadContentFromEtcd([]string{"http://etcd.in.codoon.com:2379"}, name, "/online")
 	if err != nil {
-		log.Fatalf("Fetch kafka log brokers error:%v", err)
+		log.Printf("Fetch kafka log brokers error:%v", err)
 	}
 
 	bytes := []byte(brokers)
