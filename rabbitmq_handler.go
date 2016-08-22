@@ -2,6 +2,7 @@ package common
 
 import (
 	"sync"
+	"runtime/debug"
 	"third/amqp"
 	"time"
 )
@@ -11,6 +12,7 @@ type AMQPReceipt struct {
 	alive    bool
 	i        int
 	channel  *amqp.Channel
+	openMu  sync.Mutex
 	delivery *amqp.Delivery
 }
 
@@ -34,6 +36,8 @@ func (r *AMQPReceipt) Reject() {
 //}
 
 func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error) {
+	r.openMu.Lock()
+	defer r.openMu.Unlock()
 	if r.alive {
 		return
 	}
@@ -60,12 +64,12 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 		false, // noWait
 		arguments,
 	)
-	//amqpMessagePool.New = func() interface{} {
-	//	var message AmqpMessage
-	//	message.Receipt = r
-	//	common.Infof("amqpMessagePool get new")
-	//	return &message
-	//}
+	amqpMessagePool.New = func() interface{} {
+		var message AmqpMessage
+		message.Receipt = r
+		//Infof("amqpMessagePool get new")
+		return &message
+	}
 	Noticef("amqp connect success ")
 	return
 }
@@ -91,9 +95,17 @@ func (r *AMQPReceipt) Publish(queue_name string, payload []byte) error {
 }
 
 var AmqpReceipt AMQPReceipt
+var amqp_client_uri string
+var amqp_client_queue string
 
 func InitRabbitmqClient(uri, queue string) error {
+	amqp_client_uri = uri
+	amqp_client_queue = queue
 	return AmqpReceipt.Connect(uri, queue, false)
+}
+
+func ReconnAmqpClient() error {
+	return AmqpReceipt.Connect(amqp_client_uri, amqp_client_queue, false)
 }
 
 type AmqpMessage struct {
@@ -118,14 +130,13 @@ func NewAmqpMessage(r *AMQPReceipt) *AmqpMessage {
 
 func PutMessage(message *AmqpMessage) {
 	//message.Receipt.Ack()
-	/*
+
 		if nil != message {
 			amqpMessagePool.Put(message)
 		} else {
-			common.Errorf("put nil message")
-			common.Infof(string(debug.Stack()))
+		Errorf("put nil message")
+		Infof(string(debug.Stack()))
 		}
-	*/
 }
 
 func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMessage, error) {
@@ -148,8 +159,8 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 	amqpMessages := make(chan *AmqpMessage, rate)
 	go func() {
 		for d := range deliveries {
-			Noticef("amqp recv message")
-			/*
+			Infof("amqp recv message")
+
 				message := amqpMessagePool.Get()
 				switch message.(type) {
 				case *AmqpMessage:
@@ -162,12 +173,13 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 					message.(*AmqpMessage).MessageId = 0
 					message.(*AmqpMessage).RetryTime = 0
 					amqpMessages <- message.(*AmqpMessage)
+				message.(*AmqpMessage).Receipt.Ack()
 				default:
-					common.Errorf("pool type error :%T", message)
+				Errorf("pool type error :%T", message)
 				}
-			*/
+			/*
 
-			message := NewAmqpMessage(r)
+				message := NewAmqpMessage(c)
 			message.Body = d.Body
 			message.ContentType = d.ContentType
 			message.Receipt.delivery = &d
@@ -178,6 +190,7 @@ func (r *AMQPReceipt) GetMessages(queue_name string, rate int) (<-chan *AmqpMess
 			message.RetryTime = 0
 			amqpMessages <- message
 			message.Receipt.Ack()
+			*/
 		}
 		// connection was lost
 		Errorf("!!!!!!!!amqp quit, close channel!!!!!!!!!!!!!!!")
