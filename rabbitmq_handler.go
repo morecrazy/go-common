@@ -67,7 +67,7 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 	amqpMessagePool.New = func() interface{} {
 		var message AmqpMessage
 		message.Receipt = r
-		Infof("amqpMessagePool get new")
+		//Infof("amqpMessagePool get new")
 		return &message
 	}
 	Noticef("amqp connect success ")
