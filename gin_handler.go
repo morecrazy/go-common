@@ -3,7 +3,6 @@ package common
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -228,16 +227,17 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 	go func() {
 		for err := range producer.Errors() {
 			log.Println("Failed to write kafka log entry:", err)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 
-	var partition int32
-	if srvCode == "" {
-		partition = 0
-	} else {
-		srvCodeI64, _ := binary.ReadVarint(bytes.NewReader([]byte(srvCode)))
-		partition = int32(srvCodeI64) % KAFKA_PARTITION_COUNT
-	}
+	// var partition int32
+	// if srvCode == "" {
+	// 	partition = 0
+	// } else {
+	// 	srvCodeI64, _ := binary.ReadVarint(bytes.NewReader([]byte(srvCode)))
+	// 	partition = int32(srvCodeI64) % KAFKA_PARTITION_COUNT
+	// }
 
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -271,10 +271,11 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 
 		select {
 		case inputChannel <- &kafka.ProducerMessage{
-			Topic:     KAFKA_TOPIC,
-			Partition: partition,
-			Key:       kafka.StringEncoder(srvName),
-			Value:     m,
+			Topic: KAFKA_TOPIC,
+			// Partition: partition,
+			// Key:       kafka.StringEncoder(srvName),
+			Key:   nil,
+			Value: m,
 		}:
 		// pass
 		case <-time.After(1 * time.Second):
