@@ -60,6 +60,14 @@ var OTHER_CITY map[string]string = map[string]string{
 func GetCityFromCode(code string) string {
 	//六位城市编码
 	//根据前四位编码返回城市名
+
+	// ######## 客户端手机端所传city_code长度不一致######
+	if len(code) < 6 {
+		for i := 0; i < 6-len(code); i++ {
+			code += "0"
+		}
+	}
+
 	if len(code) == 6 {
 		if _, ok := CODE2NAME[code[:4]]; ok {
 			return CODE2NAME[code[:4]]
