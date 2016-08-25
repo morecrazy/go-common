@@ -8,6 +8,7 @@ import (
 	"strings"
 	"third/context"
 	etcd "third/etcd-client"
+	"os"
 )
 
 var RawData []byte
@@ -40,13 +41,20 @@ func CfgFromEtcd(api etcd.KeysAPI, service, env string) (string, error) {
 	return rsp.Node.Value, nil
 }
 
-func LoadCfgFromEtcd(addrs []string, service, env string, cfg interface{}) error {
+func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 	api, err := NewEtcdApi(addrs)
 	if err != nil {
 		return err
 	}
 
-	data, err := CfgFromEtcd(api, service, env)
+	var environment = os.Getenv("GOENV")
+	if environment == "" {
+		environment = "online"
+	} else {
+		environment = strings.ToLower(environment)
+	}
+
+	data, err := CfgFromEtcd(api, service, environment)
 	if err != nil {
 		return err
 	}
