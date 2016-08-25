@@ -26,3 +26,16 @@ func _TestGenCityCode(t *testing.T) {
 	}
 	log.Printf("OTHER_CITY_CODE:%#v", OTHER_CITY_CODE)
 }
+
+func TestGetCodeFromCity(t *testing.T) {
+	city := "白沙黎族自治县"
+	code := GetCodeFromCity(city)
+	if code != "469025" {
+		t.Errorf("TestGetCodeFromCity err should be 469025")
+	}
+	city = "白沙黎族自治县22"
+	code = GetCodeFromCity(city)
+	if code != "" {
+		t.Logf("TestGetCodeFromCity err should be empty", city, code)
+	}
+}

@@ -90,5 +90,8 @@ var NAME2CODE map[string]string = map[string]string{"舟山市": "3309", "温州
 }
 
 func GetCodeFromCity(city string) string {
-	return NAME2CODE[city]
+	if code, ok := NAME2CODE[city]; ok {
+		return code
+	}
+	return ""
 }
