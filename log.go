@@ -14,6 +14,9 @@ var backend_info_leveld logging.LeveledBackend
 
 //zhangjl 设置logging 地址
 func SetLoggerDir(logDir string)  {
+	if Config == nil{
+		Config = &Configure{}
+	}
 	Config.LogDir = logDir
 }
 
