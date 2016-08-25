@@ -11,6 +11,12 @@ var Logger *logging.Logger
 var MysqlLogger *log.Logger
 var backend_info_leveld logging.LeveledBackend
 
+
+//zhangjl 设置logging 地址
+func SetLoggerDir(logDir string)  {
+	Config.LogDir = logDir
+}
+
 func InitLogger(process_name string) (*logging.Logger, error) {
 
 	if Logger != nil {
