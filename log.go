@@ -17,8 +17,19 @@ func SetLoggerDir(logDir string)  {
 	if Config == nil{
 		Config = &Configure{}
 	}
+
 	Config.LogDir = logDir
 }
+
+//zhangjl 设置logging Level
+func SetLoggerLevel(LogLevel string)  {
+	if Config == nil{
+		Config = &Configure{}
+	}
+
+	Config.LogLevel = LogLevel
+}
+
 
 func InitLogger(process_name string) (*logging.Logger, error) {
 
