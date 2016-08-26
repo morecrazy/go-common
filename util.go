@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/mail"
 	"net/smtp"
 	"os"
@@ -458,4 +459,20 @@ func ValidateUserId(user_id string) bool {
 		return false
 	}
 	return true
+}
+
+// get rand num range [min, max]
+// addd by wuql 2016-8-26
+func RandIntRange(min, max int) int {
+	if min == max {
+		return min
+	}
+	// incompatible when min and max reversed
+	if min > max {
+		mid := min
+		min = max
+		max = mid
+	}
+	rand.Seed(time.Now().UTC().UnixNano())
+	return min + rand.Intn(max-min+1)
 }
