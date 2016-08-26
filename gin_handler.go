@@ -192,7 +192,7 @@ func GinLogTracer(srvName, srvCode, name string) gin.HandlerFunc {
 	brokers, err := LoadContentFromEtcd([]string{"http://etcd.in.codoon.com:2379"}, name, "/online")
 	if err != nil {
 		log.Printf("Fetch kafka log brokers error:%v", err)
-		return func(*gin.Context){}
+		return func(*gin.Context) {}
 	}
 
 	bytes := []byte(brokers)
@@ -222,6 +222,7 @@ func GinKafkaLogger(srvName, srvCode string, brockerList []string) gin.HandlerFu
 	producer, err := kafka.NewAsyncProducer(brockerList, config)
 	if err != nil {
 		log.Printf("create producer error:%v", err)
+		return func(*gin.Context) {}
 	}
 	inputChannel := producer.Input()
 	// monitor kafka error
