@@ -53,6 +53,7 @@ func LoadCfgFromEtcd(addrs []string, service string, cfg interface{}) error {
 	} else {
 		environment = strings.ToLower(environment)
 	}
+	fmt.Println("environment", environment)
 
 	data, err := CfgFromEtcd(api, service, environment)
 	if err != nil {
