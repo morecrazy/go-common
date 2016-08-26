@@ -31,13 +31,14 @@ func PrintCostAnalyse(costList []CostAnalyse) {
 	}
 
 	var str string
+	str = fmt.Sprintf("[total:%d ms] ", costList[len(costList) - 1].At - costList[0].At)
 	for i, costNode := range costList {
 		if i == len(costList) - 1 {
 			break
 		}
 		nextNode := costList[i + 1]
 		costTime := nextNode.At.Sub(costNode.At).Nanoseconds()/1000000
-		str += fmt.Sprintf("[%s-%s:%d ms] ", nextNode.Name, costNode.Name, costTime)
+		str += fmt.Sprintf("[%s-%s:%d ms]", nextNode.Name, costNode.Name, costTime)
 	}
 	Noticef("%s", str)
 }
