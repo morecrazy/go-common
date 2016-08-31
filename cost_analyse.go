@@ -38,7 +38,7 @@ func PrintCostAnalyse(costList []CostAnalyse) {
 		}
 		nextNode := costList[i + 1]
 		costTime := nextNode.At.Sub(costNode.At).Nanoseconds()/1000000
-		str += fmt.Sprintf("[%s-%s:%d ms]", nextNode.Name, costNode.Name, costTime)
+		str += fmt.Sprintf("[%s~%s:%d ms]", costNode.Name, nextNode.Name, costTime)
 	}
 	Noticef("%s", str)
 }
