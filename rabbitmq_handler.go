@@ -44,13 +44,13 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 
 	conn, err := amqp.Dial(uri)
 	if err != nil {
-		Errorf("amqp dial error :%v", err)
+		Errorf("amqp.dial %s,%s error :%v", uri, queue, err)
 		return
 	}
 
 	r.channel, err = conn.Channel()
 	if err != nil {
-		Errorf("conn.Channel error :%v", err)
+		Errorf("conn.Channel %s,%s error :%v", uri, queue, err)
 		return
 	}
 	r.alive = true
@@ -70,7 +70,7 @@ func (r *AMQPReceipt) Connect(uri string, queue string, durable bool) (err error
 		//Infof("amqpMessagePool get new")
 		return &message
 	}
-	Noticef("amqp connect success ")
+	Noticef("amqp connect %s,%s success ", uri, queue)
 	return
 }
 
@@ -78,20 +78,25 @@ func (r *AMQPReceipt) IsConnected() bool {
 	return r.alive
 }
 
-func (r *AMQPReceipt) Publish(queue_name string, payload []byte) error {
+func (r *AMQPReceipt) Publish(queue string, payload []byte) (err error) {
 	msg := amqp.Publishing{
 		DeliveryMode: amqp.Persistent,
 		Timestamp:    time.Now(),
 		ContentType:  "application/json",
 		Body:         payload,
 	}
-	return r.channel.Publish(
+	err = r.channel.Publish(
 		"",
-		queue_name,
+		queue,
 		false,
 		false,
 		msg,
 	)
+	if err != nil {
+		Errorf("amqp.Publish %s,%s error :%v", amqp_client_uri, queue, err)
+	}
+
+	return err
 }
 
 var AmqpReceipt AMQPReceipt
