@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"log"
+	"os"
 	"third/go-logging"
 	"third/raven-go"
 )
@@ -11,10 +12,9 @@ var Logger *logging.Logger
 var MysqlLogger *log.Logger
 var backend_info_leveld logging.LeveledBackend
 
-
 //zhangjl 设置logging 地址
-func SetLoggerDir(logDir string)  {
-	if Config == nil{
+func SetLoggerDir(logDir string) {
+	if Config == nil {
 		Config = &Configure{}
 	}
 
@@ -22,14 +22,36 @@ func SetLoggerDir(logDir string)  {
 }
 
 //zhangjl 设置logging Level
-func SetLoggerLevel(LogLevel string)  {
-	if Config == nil{
+func SetLoggerLevel(LogLevel string) {
+	if Config == nil {
 		Config = &Configure{}
 	}
 
 	Config.LogLevel = LogLevel
 }
 
+func loggerInit() {
+
+	Logger = logging.MustGetLogger("log_not_configed")
+
+	info_log_fp := os.Stdout
+	err_log_fp := os.Stderr
+	format_str := "%{color}%{level:.4s}:%{time:2006-01-02 15:04:05.000}[%{id:03x}][%{goroutineid}/%{goroutinecount}] %{shortfile}%{color:reset} %{message}"
+
+	backend_info := logging.NewLogBackend(info_log_fp, "", 0)
+	backend_err := logging.NewLogBackend(err_log_fp, "", 0)
+	format := logging.MustStringFormatter(format_str)
+	backend_info_formatter := logging.NewBackendFormatter(backend_info, format)
+	backend_err_formatter := logging.NewBackendFormatter(backend_err, format)
+
+	backend_info_leveld = logging.AddModuleLevel(backend_info_formatter)
+	backend_info_leveld.SetLevel(logging.NOTICE, "")
+
+	backend_err_leveld := logging.AddModuleLevel(backend_err_formatter)
+	backend_err_leveld.SetLevel(logging.WARNING, "")
+
+	logging.SetBackend(backend_info_leveld, backend_err_leveld)
+}
 
 func InitLogger(process_name string) (*logging.Logger, error) {
 
@@ -37,6 +59,10 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 		return nil, nil
 	}
 
+	if nil == Config {
+		fmt.Println("please set logger path and logger level with SetLoggerLevel SetLoggerDir")
+		return nil, nil
+	}
 	//format_str := "%{color}%{level}:[%{time:2006-01-02 15:04:05.000}][goroutine:%{goroutinecount}][%{shortfile}]%{color:reset}[%{message}]"
 	format_str := "%{color}%{level:.4s}:%{time:2006-01-02 15:04:05.000}[%{id:03x}][%{goroutineid}/%{goroutinecount}] %{shortfile}%{color:reset} %{message}"
 	Logger = logging.MustGetLogger(process_name)
@@ -105,6 +131,11 @@ func InitLogger(process_name string) (*logging.Logger, error) {
 func InitLogger1(process_name, format_str string) (*logging.Logger, error) {
 
 	if Logger != nil {
+		return nil, nil
+	}
+
+	if nil == Config {
+		fmt.Println("please set logger path and logger level with SetLoggerLevel SetLoggerDir")
 		return nil, nil
 	}
 

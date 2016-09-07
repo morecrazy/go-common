@@ -25,7 +25,7 @@ var _httpClient *http.Client
 // The Client's Transport typically has internal state (cached TCP connections),
 // so Clients should be reused instead of created as needed.
 // Clients are safe for concurrent use by multiple goroutines.
-func init() {
+func httpClientInit() {
 	tr := &http.Transport{
 		Dial: func(network, addr string) (conn net.Conn, err error) {
 			return net.DialTimeout(network, addr, 5*time.Second)

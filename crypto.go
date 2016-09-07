@@ -18,7 +18,7 @@ const _hmac_key = "bes3a3ZnfHzttfkWAUGfxzXPutuRQgUE"
 // _hmac_internale_api_token should only be set during init
 var _hmac_internale_api_token string
 
-func init() {
+func cryptoInit() {
 	_hmac_internale_api_token = GenMAC("8NK8wjZfJLXtWNUtETPxptNGxcRPFjQw")
 }
 

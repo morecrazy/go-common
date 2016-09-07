@@ -14,42 +14,47 @@ var SportsSortClinet *RpcClient
 
 func InitRpcClient() error {
 	var err error
-
-	UserProfileClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserprofileRpcFuncMap, "userprofile", Logger)
-	if err != nil {
-		Logger.Error("init UserProfileClient err :", err.Error())
+	if nil == Config {
+		return fmt.Errorf("please init common Conifg ")
+	}
+	UserProfileSetting, ok := Config.RpcSetting["UserProfileSetting"]
+	if ok {
+		UserProfileClient, err = NewRpcClient(UserProfileSetting.Addr, UserProfileSetting.Net, UserprofileRpcFuncMap, "userprofile", Logger)
+		if err != nil {
+			Logger.Error("init UserProfileClient err :", err.Error())
+		}
+		//userlogin 和 userprofile 同一个服务
+		UserLoginClient, err = NewRpcClient(UserProfileSetting.Addr, UserProfileSetting.Net, UserloginRpcFuncMap, "userlogin", Logger)
+		if err != nil {
+			Logger.Error("init UserLoginClient err :", err.Error())
+		}
 	}
 
-	UserLoginClient, err = NewRpcClient(Config.RpcSetting["UserProfileSetting"].Addr, Config.RpcSetting["UserProfileSetting"].Net, UserloginRpcFuncMap, "userlogin", Logger)
-	if err != nil {
-		Logger.Error("init UserLoginClient err :", err.Error())
+	UserRelationSetting, ok := Config.RpcSetting["UserRelationSetting"]
+	if ok {
+		UserRelationClient, err = NewRpcClient(UserRelationSetting.Addr, UserRelationSetting.Net, UserRelationRpcFuncMap, "userrelation", Logger)
+		if err != nil {
+			Logger.Error("init UserRelationClient err :", err.Error())
+		}
 	}
 
-	UserRelationClient, err = NewRpcClient(Config.RpcSetting["UserRelationSetting"].Addr, Config.RpcSetting["UserRelationSetting"].Net, UserRelationRpcFuncMap, "userrelation", Logger)
-	if err != nil {
-		Logger.Error("init UserRelationClient err :", err.Error())
+	RouteServerSetting, ok := Config.RpcSetting["RouteServerSetting"]
+	if ok {
+		RouteServerClinet, err = NewRpcClient(RouteServerSetting.Addr, RouteServerSetting.Net, RouteServerRpcFuncMap, "routeserver", Logger)
+		if err != nil {
+			Logger.Error("init RouteServerClinet err :", err.Error())
+		}
 	}
 
-	RouteServerClinet, err = NewRpcClient(Config.RpcSetting["RouteServerSetting"].Addr, Config.RpcSetting["RouteServerSetting"].Net, RouteServerRpcFuncMap, "routeserver", Logger)
-	if err != nil {
-		Logger.Error("init RouteServerClinet err :", err.Error())
-	}
-
-	SportsSortClinet, err = NewRpcClient(Config.RpcSetting["SportsSortSetting"].Addr, Config.RpcSetting["SportsSortSetting"].Net, SportsSortRpcFuncMap, "sportssort", Logger)
-	if err != nil {
-		Logger.Error("init SportsSortClinet err :", err.Error())
+	SportsSortSetting, ok := Config.RpcSetting["SportsSortSetting"]
+	if ok {
+		SportsSortClinet, err = NewRpcClient(SportsSortSetting.Addr, SportsSortSetting.Net, SportsSortRpcFuncMap, "sportssort", Logger)
+		if err != nil {
+			Logger.Error("init SportsSortClinet err :", err.Error())
+		}
 	}
 
 	return nil
-}
-
-func InitRelationRpcClient(addr string, net string) error {
-	var err error
-	UserRelationClient, err = NewRpcClient(addr, net, UserRelationRpcFuncMap, "userrelation", Logger)
-	if err != nil {
-		Logger.Error("init UserRelationClient err :", err.Error())
-	}
-	return err
 }
 
 // 只使用 GetProfile的接口，单独初始化
@@ -126,111 +131,6 @@ func GetLoginById(userId string) (UserLogin, error) {
 	}
 
 	return reply.UserLogin, err
-}
-
-func GetFollower(userId string) (follower_ids []string, err error) {
-	var get_all = false
-	var page_num = 1
-	for !get_all {
-		var req = GetFollowingReq{
-			Selfuserid: userId,
-			Pagenum:    page_num,
-			Pagesize:   1000,
-		}
-		var resp GetFollowingRes
-
-		err = UserRelationClient.Call("get_follower", &req, &resp)
-		if nil != err {
-			Logger.Error("get_follower err :%v", err)
-			return follower_ids, err
-		}
-		page_num += 1
-
-		if 0 == len(resp.Data) {
-			break
-		}
-
-		for _, value := range resp.Data {
-			follower_ids = append(follower_ids, value)
-		}
-		if len(resp.Data) >= 1000 {
-			get_all = false
-		} else {
-			get_all = true
-		}
-	}
-
-	return follower_ids, err
-}
-
-func GetFollowing(user_id string) (following_ids []string, err error) {
-	var get_all = false
-	var page_num = 1
-	for !get_all {
-		var req = GetFollowingReq{
-			Selfuserid: user_id,
-			Pagenum:    page_num,
-			Pagesize:   1000,
-		}
-		var resp GetFollowingRes
-
-		err := UserRelationClient.Call("get_following", &req, &resp)
-		if nil != err {
-			Logger.Error("get_following err :%v", err)
-			return following_ids, err
-		}
-		page_num += 1
-
-		if 0 == len(resp.Data) {
-			break
-		}
-
-		for _, value := range resp.Data {
-			following_ids = append(following_ids, value)
-		}
-		if len(resp.Data) >= 1000 {
-			get_all = false
-		} else {
-			get_all = true
-		}
-	}
-
-	return following_ids, err
-}
-
-// 返回值 0 未关注  1 已关注 2 互相关注
-func GetFollowingFlag(user_id, target_user_id string) (int, error) {
-
-	params := map[string]string{"Selfuserid": user_id, "Targetuserid": target_user_id}
-	var reply GetFlagRes
-
-	err := UserRelationClient.Call("get_following_flag", params, &reply)
-	if err != nil {
-		Logger.Error(err.Error())
-		return 0, err
-	}
-
-	return reply.Data, nil
-
-}
-
-func FollowPeople(user_id, target_user_id string) error {
-	if "" == user_id || "" == target_user_id || user_id == target_user_id {
-		return fmt.Errorf("%s", "params error")
-	}
-	var followReq FollowingReq
-	var followRes FollowingRes
-	followReq.Selfuserid = user_id
-	followReq.Targetuserid = target_user_id
-
-	err := UserRelationClient.Call("follow", &followReq, &followRes)
-	if err != nil {
-		Logger.Error(err.Error())
-		return err
-	}
-
-	return nil
-
 }
 
 func SimplifyProcRouteLog(userId string, postData map[string]interface{}) (SimplifyProcRouteLogRes, error) {
