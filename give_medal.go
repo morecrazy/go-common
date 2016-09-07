@@ -8,12 +8,6 @@ package common
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"net/url"
-	"strings"
-	"time"
 )
 
 const (
@@ -39,42 +33,19 @@ type Medal struct {
 	Status int `json:"status"`
 }
 
-// 起时时间2秒
-func GiveUserMedal(user_id, code string) (result *Medal, err error) {
-	form := url.Values{}
-	form.Set("user_id", user_id)
-	form.Set("code", code)
-	timeout := time.Duration(2 * time.Second)
-	client := http.Client{
-		Timeout: timeout,
-	}
-	request, err := http.NewRequest("POST", GiveMedalUrl, strings.NewReader(form.Encode()))
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := client.Do(request)
-	//
-	defer resp.Body.Close()
-	//
-	if nil != err {
-		// add log
-		return nil, err
-	} else {
-		if resp.StatusCode == 200 || resp.StatusCode == 202 {
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				log.Printf("GiveUserMedal user_id:%s code:%s ioutil.ReadAll error:%v", user_id, code, err)
-				return nil, err
-			}
-			var result *Medal
-			if err := json.Unmarshal(body, result); err != nil {
-				log.Printf("GiveUserMedal user_id:%s code:%s  json.Unmarshal error:%v", user_id, code, err)
-				return nil, err
+func GiveUserMedal(user_id, code string) (*Medal, error) {
+	if data, status, err := HttpRequestWithCode(nil, "POST", GiveMedalUrl, map[string]string{"user_id": user_id, "code": code}); err == nil {
+		if status == 200 || status == 202 {
+			var result Medal
+			if err := json.Unmarshal(data, &result); err == nil {
+				return &result, nil
 			} else {
-				return result, nil
+				return nil, err
 			}
 		} else {
-			log.Printf("GiveUserMedal user_id:%s code:%s  resp.StatusCode:%v", user_id, code, resp.StatusCode)
-			return nil, errors.New("resp.StatusCode err")
+			return nil, errors.New("status code err")
 		}
+	} else {
+		return nil, err
 	}
-	return
 }

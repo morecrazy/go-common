@@ -12,7 +12,7 @@ import (
 
 func TestGiveUserMedal(t *testing.T) {
 	user_id := "b44c62d7-cd0b-4027-9e93-ad53163aca84"
-	code := "0"
+	code := "tp1"
 	a, b := GiveUserMedal(user_id, code)
 	fmt.Printf("TestGiveUserMedal, a:%v, b:%v ", a, b)
 }
