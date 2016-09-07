@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"runtime"
+	"runtime/debug"
 	"third/g2s"
 	"third/gin"
 	"time"
@@ -67,6 +69,29 @@ func bucketName(sn, host, path, method string, httpCode int) string {
 
 }
 
+func goroutineStats(serviceName string) {
+	hostName, _ := os.Hostname()
+	hostName = _reg.ReplaceAllString(hostName, "_")
+	bucket := fmt.Sprintf("%s.%s.goroutine", serviceName, hostName)
+	for {
+		n := runtime.NumGoroutine()
+		Gauge(bucket, fmt.Sprintf("%d", n))
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func gcStats(serviceName string) {
+	hostName, _ := os.Hostname()
+	hostName = _reg.ReplaceAllString(hostName, "_")
+	bucket := fmt.Sprintf("%s.%s.gc", serviceName, hostName)
+	gcs := &debug.GCStats{}
+	for {
+		debug.ReadGCStats(gcs)
+		Gauge(bucket, fmt.Sprintf("%d", gcs.NumGC))
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func consumeStats() {
 	lastRptTime := time.Now()
 	for {
@@ -96,6 +121,9 @@ func consumeStats() {
 func GinStatter(statsdAddr, serviceName string) gin.HandlerFunc {
 	initStatsD(statsdAddr)
 	serviceName = _reg.ReplaceAllString(serviceName, "_")
+
+	go goroutineStats(serviceName)
+	go gcStats(serviceName)
 
 	return func(c *gin.Context) {
 		start := time.Now()

@@ -38,7 +38,7 @@ func ReqData2Form() gin.HandlerFunc {
 			}
 			if err != nil {
 				// if request data is NOT json format, restore body
-				log.Printf("ReqData2Form parse as json failed. restore [%s] to body", string(data))
+				// log.Printf("ReqData2Form parse as json failed. restore [%s] to body", string(data))
 				c.Request.Body = ioutil.NopCloser(bytes.NewReader(data))
 			} else {
 				// if user_id in request is not empty, move it to req_user_id
